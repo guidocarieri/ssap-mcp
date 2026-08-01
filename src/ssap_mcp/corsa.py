@@ -54,6 +54,7 @@ u.SendMessageW.restype = wintypes.LPARAM
 CB = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
 WM_GETTEXT, WM_GETTEXTLENGTH, WM_SETTEXT, WM_CLOSE = 0x000D, 0x000E, 0x000C, 0x0010
 WM_LBUTTONDOWN, WM_LBUTTONUP, BM_CLICK, MK_LBUTTON = 0x0201, 0x0202, 0x00F5, 0x0001
+SW_RESTORE = 9  # ShowWindow: de-iconifica senza attivare a forza la finestra
 
 
 def T(*a):
@@ -91,6 +92,22 @@ def tutte():
     return [h for h in o if u.IsWindowVisible(h)]
 
 
+def tutte_anche_nascoste():
+    """Come `tutte()`, ma SENZA il filtro sulla visibilita'.
+
+    Serve per la finestra principale: una finestra ICONIFICATA ha
+    `IsWindowVisible == False`, quindi `tutte()` non la vede e l'attesa scade
+    su una finestra che esiste ed e' li'. Misurato il 2026-08-01: SSAP lasciato
+    minimizzato da una sessione precedente -> «la finestra non e' comparsa»
+    dopo 90 s, mentre `EnumWindows` la restituiva con titolo esatto.
+    Per i DIALOGHI resta giusto `tutte()`: un dialogo non visibile non e' da
+    sbrigare.
+    """
+    o = []
+    u.EnumWindows(CB(lambda h, l: (o.append(h), True)[1]), 0)
+    return o
+
+
 def figli(h):
     o = []
     u.EnumChildWindows(h, CB(lambda c, l: (o.append(c), True)[1]), 0)
@@ -126,11 +143,27 @@ def attendi_finestra(secondi=90):
     2026)». Misurato il 2026-07-28: tre riprese perse perche' chi lanciava
     controllava il titolo giusto sulla finestra sbagliata, e SSAP risultava
     «non aperto» mentre era li' davanti.
+
+    ⛔ Si enumera SENZA il filtro sulla visibilita' e, se la finestra e'
+    ICONIFICATA, la si RIPRISTINA prima di restituirla: minimizzata ha
+    `IsWindowVisible == False` e i controlli figli non sono pilotabili.
+    Misurato il 2026-08-01 su SSAP lasciato minimizzato da una sessione
+    precedente: attesa scaduta su una finestra che esisteva col titolo esatto.
     """
     t0 = time.time()
     while time.time() - t0 < secondi:
-        h = next((x for x in tutte() if "SSAP 2010" in txt(x)), None)
+        h = next((x for x in tutte_anche_nascoste() if "SSAP 2010" in txt(x)),
+                 None)
         if h is not None:
+            if u.IsIconic(h):
+                T("finestra iconificata: la ripristino")
+                u.ShowWindow(h, SW_RESTORE)
+                for _ in range(20):
+                    time.sleep(0.5)
+                    if not u.IsIconic(h) and u.IsWindowVisible(h):
+                        break
+                else:
+                    T("[ATTENZIONE] non e' tornata visibile dopo il ripristino")
             T(f"finestra trovata dopo {time.time()-t0:.0f} s: «{txt(h)[:50]}»")
             return h
         time.sleep(1)

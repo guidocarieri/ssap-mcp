@@ -586,8 +586,11 @@ def run_verification(
     elif RUNNER is not None:
         righe = [
             f"if (-not (Get-Process ssap2010_64bit -ErrorAction SilentlyContinue)) {{",
+            # ⛔ NON minimizzata: una finestra iconificata ha
+            # IsWindowVisible == False e i suoi controlli non sono pilotabili.
+            # Avviarla minimizzata significa sabotare il proprio pilota.
             f"  Start-Process -FilePath {_psq(SSAP_EXE)} "
-            f"-WorkingDirectory {_psq(SSAP_EXE.parent)} -WindowStyle Minimized",
+            f"-WorkingDirectory {_psq(SSAP_EXE.parent)} -WindowStyle Normal",
             f"  Start-Sleep -Seconds 12",
             f"}}",
             f"$env:SSAP_DIR = {_psq(d)}",
