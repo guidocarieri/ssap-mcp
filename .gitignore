@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+uv.lock
+.env
+
+# SSAP run artefacts: mid-run snapshots, never results
+*.tmp
+temp_*.dxf
+ANOMALY.LOG
+anomaly.log

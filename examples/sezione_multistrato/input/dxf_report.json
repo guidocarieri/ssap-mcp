@@ -1,0 +1,119 @@
+{
+  "file": "C:\\DEV\\SSAP 10\\toolkit\\examples\\sezione_multistrato\\input\\sezione_sbagliata.dxf",
+  "n_polylines": 4,
+  "n_texts": 0,
+  "n_layers": 4,
+  "layers": {
+    "0": {
+      "entities": 1,
+      "polylines": 1,
+      "texts": 0,
+      "lines": 0,
+      "color_aci": 256
+    },
+    "1": {
+      "entities": 1,
+      "polylines": 1,
+      "texts": 0,
+      "lines": 0,
+      "color_aci": 256
+    },
+    "2": {
+      "entities": 1,
+      "polylines": 1,
+      "texts": 0,
+      "lines": 0,
+      "color_aci": 256
+    },
+    "f": {
+      "entities": 1,
+      "polylines": 1,
+      "texts": 0,
+      "lines": 0,
+      "color_aci": 256
+    }
+  },
+  "bbox": {
+    "x_min": 1854.781007604348,
+    "x_max": 4562.341335642741,
+    "y_min": 1259.473658529362,
+    "y_max": 1998.621390432208,
+    "extent_x": 2707.560328038393,
+    "extent_y": 739.1477319028461
+  },
+  "polylines": [
+    {
+      "id": "2C3",
+      "layer": "0",
+      "color_aci": 256,
+      "n_points": 18,
+      "closed": false,
+      "x_min": 1854.781007604348,
+      "x_max": 4562.341335642741,
+      "y_min": 1259.473658529362,
+      "y_max": 1998.621390432208,
+      "x_first": 1854.781007604348,
+      "y_first": 1259.473658529362,
+      "x_last": 4562.341335642741,
+      "y_last": 1998.621390432208,
+      "x_strictly_increasing": true,
+      "x_non_decreasing": true,
+      "first_eq_last": "False"
+    },
+    {
+      "id": "2C9",
+      "layer": "1",
+      "color_aci": 256,
+      "n_points": 6,
+      "closed": false,
+      "x_min": 3142.959480550127,
+      "x_max": 4531.329634173348,
+      "y_min": 1669.581427893236,
+      "y_max": 1729.190120228183,
+      "x_first": 3142.959480550127,
+      "y_first": 1712.499685986223,
+      "x_last": 4531.329634173348,
+      "y_last": 1705.346644588119,
+      "x_strictly_increasing": true,
+      "x_non_decreasing": true,
+      "first_eq_last": "False"
+    },
+    {
+      "id": "2CA",
+      "layer": "2",
+      "color_aci": 256,
+      "n_points": 13,
+      "closed": true,
+      "x_min": 2365.281368765002,
+      "x_max": 3579.508861283766,
+      "y_min": 1452.605805391267,
+      "y_max": 1712.499685986223,
+      "x_first": 2365.281368765002,
+      "y_first": 1483.602325664222,
+      "x_last": 2582.363293938916,
+      "y_last": 1528.904928733387,
+      "x_strictly_increasing": false,
+      "x_non_decreasing": false,
+      "first_eq_last": "False"
+    },
+    {
+      "id": "2CB",
+      "layer": "f",
+      "color_aci": 256,
+      "n_points": 13,
+      "closed": false,
+      "x_min": 1854.781007604348,
+      "x_max": 4533.715149670992,
+      "y_min": 1259.473658529362,
+      "y_max": 1817.410978155548,
+      "x_first": 1854.781007604348,
+      "y_first": 1259.473658529362,
+      "x_last": 4533.715149670992,
+      "y_last": 1812.642281733621,
+      "x_strictly_increasing": true,
+      "x_non_decreasing": true,
+      "first_eq_last": "False"
+    }
+  ],
+  "texts": []
+}

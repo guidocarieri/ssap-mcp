@@ -1,0 +1,21 @@
+
+SSAP2010 - rel. 6.1 (2025) 
+data: 29/4/2026
+PRE-ELABORAZIONE Modello Pendio: SEZIONE_MULTISTRATO.MOD
+--------------------------------------------------------------------
+ 
+Fase 1 preprocessing TERMINATA CON SUCCESSO SENZA ERRORI!
+ 
+SI PROCEDE CON LA FASE 2 ...
+  
+---INIZIO SCANSIONE APPROFONDITA DEL MODELLO ---
+**Superficie strato 2 con nodi estremo destro non coincidente  
+  all'estremo destro X=2712.5603 della sup. topografica
+  vedasi manuale - Appendice L,  figura L.4
+  
+  
+Fase 2 preprocessing TERMINATA CON ANOMALIE o ERRORI!
+PER PROCEDERE CON LA VERIFICA DEVI PRIMA CORREGGERE 
+LE ANOMALIE SEGNALATE NEL MODELLO...
+Suggerimento: salva in un file di testo il contenuto
+di questa finestra (Premi il bottone SALVA RISULTATI)
