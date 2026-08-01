@@ -188,12 +188,57 @@ def sbriga(dove, ferma_su_scelta=True):
               for c in figli(h) if cls(c) == "Button" and u.IsWindowVisible(c)]
         et = sorted(x[1] for x in bs if x[1])
         if et == ["ok"]:
-            T(f"   [{dove}] avviso solo-OK «{txt(h)[:50]}» -> confermo")
+            # ⛔ Un solo pulsante OK NON vuol dire «avviso innocuo»: anche un
+            # ERRORE DI RUNTIME ha un solo OK. Decidere dai pulsanti invece che
+            # dal contenuto fa confermare un errore scambiandolo per un avviso,
+            # e da li' i pulsanti di avvio si invertono — perche' il calcolo si
+            # e' INTERROTTO, non concluso — e il pilota crede di aver finito.
+            # Misurato il 2026-08-01 sul modello con geogriglie: avviso
+            # confermato a 70 s, «FINITA» un secondo dopo, report mai scritto
+            # mentre SSAP continuava a scaricare 386 MB di temporanei.
+            # Peggio del report mancante sarebbe un Fs scritto e sbagliato.
+            corpo = " / ".join(
+                txt(c).strip() for c in figli(h)
+                if cls(c) != "Button" and len(txt(c).strip()) > 8)[:300]
+            spia = f"{txt(h)} {corpo}".lower()
+            if any(p in spia for p in (
+                    "error", "errore", "invalid", "exception", "violation",
+                    "overflow", "division", "divisione", "corrupt", "abort",
+                    "fault", "not enough", "out of memory", "memoria")):
+                raise SystemExit(
+                    f"[STOP] [{dove}] SSAP ha segnalato un ERRORE, non un "
+                    f"avviso: «{txt(h)[:40]}» — {corpo or 'testo non leggibile '
+                    'a codice: il messaggio e disegnato'} — non lo confermo: "
+                    f"il risultato non sarebbe attendibile")
+            T(f"   [{dove}] avviso solo-OK «{txt(h)[:50]}»"
+              + (f" — {corpo}" if corpo else " (testo non leggibile a codice)")
+              + " -> confermo")
             premi_std(next(x[0] for x in bs if x[1] == "ok"))
             time.sleep(1.0)
         elif et and ferma_su_scelta:
-            raise SystemExit(f"[FERMO] [{dove}] dialogo con scelta {et}: "
-                             f"«{txt(h)[:60]}» — la decisione non la prende uno script")
+            # ⛔ Due doveri insieme, e vanno tenuti distinti.
+            # 1) NON si decide al posto dell'utente: un «VUOI PROCEDERE
+            #    UGUALMENTE?» su scarsa convergenza e' una scelta geotecnica.
+            # 2) Ma non si lascia il dialogo aperto: e' MODALE, e blocca ogni
+            #    corsa successiva. Misurato il 2026-08-01: un avviso rimasto
+            #    aperto ha fatto fallire 11 casi di fila in 8 secondi l'uno.
+            # Si risponde dunque col RIFIUTO (No/Annulla) — che non e' decidere
+            # di proseguire — si RIPORTA il testo, e si esce.
+            corpo = " / ".join(
+                txt(c).strip() for c in figli(h)
+                if cls(c) != "Button" and len(txt(c).strip()) > 12)[:400]
+            rifiuto = next((c for c, e in bs
+                            if e in ("no", "annulla", "cancel", "abort")), None)
+            if rifiuto is not None:
+                premi_std(rifiuto)
+                time.sleep(0.8)
+                T(f"   [{dove}] dialogo rifiutato (No) per non bloccare le corse "
+                  f"successive: la scelta resta all'utente")
+            raise SystemExit(
+                f"[FERMO] [{dove}] SSAP chiede una decisione {et}: "
+                f"«{txt(h)[:60]}»"
+                + (f" — {corpo}" if corpo else "")
+                + " — la decisione non la prende uno script")
 
 
 def chiudi_audit():

@@ -666,8 +666,27 @@ def run_verification(
     m = _re.search(r"FS_MIN=([0-9.]+)", out)
     n = _re.search(r"superfici = (\d+)", out)
     rep = d / f"report_{model_name}.txt"
+
+    # ⛔ Se il Fs non c'e', il MOTIVO va detto a chi ha chiamato, non sepolto
+    # nel log. Il caso tipico e' SSAP che chiede una decisione — «PROBLEMI di
+    # SCARSA CONVERGENZA … VUOI PROCEDERE UGUALMENTE?» — che nessuno script
+    # deve prendere. Restituire ok=False senza spiegazione fa sembrare guasto
+    # lo strumento quando invece sta rispettando un limite.
+    if m is None:
+        fermo = _re.search(r"\[FERMO\][^\n]*", out)
+        stop = _re.search(r"\[STOP\][^\n]*", out)
+        motivo = (fermo or stop)
+        return {
+            "ok": False,
+            "error": (motivo.group(0).strip() if motivo
+                      else "la corsa non ha prodotto un Fs"),
+            "richiede_decisione": bool(fermo),
+            "elapsed_s": r["elapsed_s"],
+            "log": out,
+        }
+
     return {
-        "ok": m is not None,
+        "ok": True,
         "fs_min": float(m.group(1)) if m else None,
         "n_superfici": int(n.group(1)) if n else None,
         "report_path": str(rep) if rep.exists() else None,
