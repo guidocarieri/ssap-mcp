@@ -497,12 +497,29 @@ def _run_here(model_dir: Path, model_name: str, timeout_s: int) -> dict:
 
 # ── Analysis options: the .PAR is the channel ──
 
-METHODS = {1: "Spencer", 2: "Sarma I", 3: "Morgenstern-Price",
-           4: "Chen-Morgenstern", 5: "Sarma II", 6: "Janbu rigorous",
-           7: "Borselli 2016"}
-ENGINES = {1: "Random Search", 2: "Convex Random Search",
-           3: "Sniff Random Search", 4: "New Random Search",
-           5: "Mixed Engines Search"}
+# ⛔ MEASURED, not remembered. These numbers were verified by running each value
+# and reading back the `METODO DI CALCOLO` / `MOTORE DI RICERCA` lines of the
+# final report — the only authoritative statement of what SSAP actually used.
+# An earlier hand-written table had six of the seven methods wrong (it started
+# at Spencer), so a caller asking for Janbu would have been told "Spencer".
+# If SSAP renumbers these in a future build, the report will say so: trust it,
+# not this table.
+METHODS = {
+    1: "Janbu rigorous (Janbu, 1973)",
+    2: "Spencer (Spencer, 1973)",
+    3: "Sarma I (Sarma, 1973)",
+    4: "Morgenstern-Price (Morgenstern & Price, 1965)",
+    5: "Chen-Morgenstern (Chen & Morgenstern, 1983)",
+    6: "Sarma II (Sarma, 1979)",
+    7: "Borselli (Borselli, 2016)",
+}
+ENGINES = {
+    1: "Random Search (Siegel, 1981)",
+    2: "Convex Random (Chen, 1992)",
+    3: "Sniff Random Search 3.4 (Borselli, 1997-2025)",
+    4: "New Random Search 2.0 (Borselli, 2021-2025)",
+    5: "Mixed Engines Search 2.0 (Borselli, 2025-2026)",
+}
 
 
 @mcp.tool()
@@ -577,9 +594,43 @@ def run_verification(
     d = Path(model_dir)
     if not (d / f"{model_name}.MOD").exists():
         return {"ok": False, "error": f"manca {model_name}.MOD in {d}"}
-    if not (d / f"{model_name}.par").exists():
+    par = d / f"{model_name}.par"
+    if not par.exists():
         return {"ok": False, "error": f"manca {model_name}.par in {d} "
                                       f"(le impostazioni sono obbligatorie)"}
+
+    # ⛔ Il .PAR non e' un file di preferenze: porta dentro le coordinate della
+    # finestra di ricerca ed e' legato AL MODELLO. Applicarne uno di un altro
+    # lavoro manda SSAP in «Invalid floating point operation», con un dialogo
+    # che propone di IGNORARE e RISCHIARE LA CORRUZIONE DEI DATI: misurato il
+    # 2026-08-01 con limiti a X~1974..2036 su un modello largo da 10 a 35 m.
+    # Riusare il .par del lavoro precedente e' la cosa piu' naturale che un
+    # utente possa fare: qui ci si ferma PRIMA, non lo si scopre a valle.
+    from .congruenza import verifica as _congr, estensione_modello  # noqa: F401
+    dat = None
+    for r in (d / f"{model_name}.MOD").read_text(
+            encoding="latin-1", errors="replace").splitlines()[1:]:
+        nome = r.strip()
+        if nome.lower().endswith(".dat"):
+            cand = d / nome
+            dat = cand if cand.exists() else next(
+                (x for x in d.iterdir() if x.name.lower() == nome.lower()), None)
+            break
+    if dat is not None and dat.exists():
+        try:
+            g = _congr(par, dat)
+        except Exception as e:  # noqa: BLE001
+            g = {"ok": True, "motivo": f"controllo non eseguibile: {e}"}
+        if not g["ok"]:
+            return {
+                "ok": False,
+                "error": f"il file di impostazioni non appartiene a questo "
+                         f"modello: {g['motivo']}",
+                "modello_x": g["modello_x"],
+                "limiti_par": g["fuori_intervallo"],
+                "rimedio": "carica il .MOD in SSAP, imposta la verifica e "
+                           "salva un .PAR nuovo per QUESTO modello",
+            }
 
     if _is_elevated():
         r = _run_here(d, model_name, timeout)
