@@ -694,14 +694,67 @@ def run_verification(
         fermo = _re.search(r"\[FERMO\][^\n]*", out)
         stop = _re.search(r"\[STOP\][^\n]*", out)
         motivo = (fermo or stop)
-        return {
+        errore = (motivo.group(0).strip() if motivo
+                  else "la corsa non ha prodotto un Fs")
+
+        # ⛔ Una corsa che non finisce non e' «lo strumento e' lento»: quasi
+        # sempre e' il MODELLO che non converge, e il manuale lo elenca fra le
+        # cause — eccesso di forza stabilizzante da tiranti, palificate,
+        # geogriglie o wiremesh; tension crack inadatto; tolleranze troppo
+        # strette su strati scadenti. SSAP a volte lo dichiara con un avviso,
+        # altre volte itera e basta.
+        # Restituire un asciutto «non finita entro N s» fa sembrare guasto lo
+        # strumento e manda l'utente a cercare il problema dalla parte sbagliata.
+        # Misurato il 2026-08-01: modelli con rinforzi a 80 e 150 kN/m fermi
+        # oltre 40 min, mentre gli stessi modelli senza opere chiudevano in 60-120 s.
+        non_finita = "non finita entro" in errore
+        fuori = {
             "ok": False,
-            "error": (motivo.group(0).strip() if motivo
-                      else "la corsa non ha prodotto un Fs"),
+            "error": errore,
             "richiede_decisione": bool(fermo),
             "elapsed_s": r["elapsed_s"],
             "log": out,
         }
+        if non_finita:
+            n_tir = n_pil = n_grd = n_wrm = 0
+            try:
+                for riga in (d / f"{model_name}.MOD").read_text(
+                        encoding="latin-1", errors="replace").splitlines()[1:]:
+                    e = riga.strip().lower()
+                    n_tir += e.endswith(".tir")
+                    n_pil += e.endswith(".pil")
+                    n_grd += e.endswith(".grd")
+                    n_wrm += e.endswith(".wrm")
+            except OSError:
+                pass
+            rinforzi = n_tir or n_pil or n_grd or n_wrm
+            fuori["probabile_causa"] = (
+                "il modello non converge. Il calcolo era ancora in corso allo "
+                "scadere del tempo, senza errori: questo modello dichiara "
+                "opere di rinforzo, e un ECCESSO DI FORZA STABILIZZANTE e' la "
+                "prima causa di mancata convergenza indicata dal manuale."
+                if rinforzi else
+                "il modello non converge, oppure il tempo concesso e' troppo "
+                "breve per la sua estensione. Nessun errore e' stato segnalato."
+            )
+            fuori["da_provare"] = ([
+                "ridurre la tensione dei tiranti / la resistenza delle "
+                "geogriglie / i parametri delle wiremesh",
+                "applicare un fattore riduttivo > 2 alla forza delle palificate",
+                "attivare o disattivare l'effetto tension crack in testa",
+                "allargare le tolleranze RHO e N' negativi (fino al 50% su "
+                "strati scadenti)",
+            ] if rinforzi else [
+                "aumentare `timeout`",
+                "ridurre NUMERO SUPERFICI nel .par",
+                "verificare le convenzioni geometriche del modello",
+            ])
+            fuori["nota_costo"] = (
+                "se il .par ha attive le MAPPE di Fs locale o di pressione dei "
+                "fluidi, la corsa calcola molto piu' del solo Fs: una griglia "
+                "800x800 produce centinaia di MB di file temporanei."
+            )
+        return fuori
 
     return {
         "ok": True,
