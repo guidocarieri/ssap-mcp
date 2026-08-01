@@ -385,6 +385,22 @@ RUNNER = Path(_runner_env) if _runner_env else None
 RUNNER_TASK = os.environ.get("SSAP_RUNNER_TASK", "SSAP-ElevatedRunner")
 
 
+def _psq(value) -> str:
+    """Quote a value for a PowerShell single-quoted string.
+
+    In PowerShell a single-quoted string ends at the first `'`, and everything
+    after it is parsed as CODE. Escaping is done by DOUBLING the quote, not with
+    a backslash and not with `shlex.quote` (which is POSIX and would be wrong
+    here). Inside single quotes `$`, backtick and `;` are literal, so doubling
+    the quote is sufficient.
+
+    This matters for ordinary paths, not just for hostile ones: a folder named
+    `l'argine` or `Sant'Anna` is enough to break the command — and the command
+    runs elevated.
+    """
+    return "'" + str(value).replace("'", "''") + "'"
+
+
 def _is_elevated() -> bool:
     """True if this process already has administrator rights."""
     try:
@@ -414,7 +430,7 @@ def _esegui_elevato(righe: list[str], timeout_s: int) -> dict:
 
     stato = subprocess.run(
         ["powershell.exe", "-NoProfile", "-Command",
-         f"(Get-ScheduledTask -TaskName '{RUNNER_TASK}').State"],
+         f"(Get-ScheduledTask -TaskName {_psq(RUNNER_TASK)}).State"],
         capture_output=True, text=True)
     if "Running" in stato.stdout:
         return {"ok": False, "error": "il runner elevato e' gia' occupato "
@@ -423,7 +439,7 @@ def _esegui_elevato(righe: list[str], timeout_s: int) -> dict:
     res.write_text("", encoding="utf-8")
     cmd_ps.write_text("\n".join(righe) + "\n", encoding="utf-8")
     subprocess.run(["powershell.exe", "-NoProfile", "-Command",
-                    f"Start-ScheduledTask -TaskName '{RUNNER_TASK}'"],
+                    f"Start-ScheduledTask -TaskName {_psq(RUNNER_TASK)}"],
                    capture_output=True, text=True)
 
     t0 = _t.time()
@@ -464,7 +480,16 @@ def _run_here(model_dir: Path, model_name: str, timeout_s: int) -> dict:
             [str(PYTHON_ELEVATO), str(PACKAGE_DIR / "corsa.py")],
             env=env, capture_output=True, text=True, timeout=timeout_s + 120)
     except subprocess.TimeoutExpired:
-        return {"ok": False, "error": f"no result within {timeout_s + 120} s"}
+        return {
+            "ok": False,
+            "error": f"no result within {timeout_s + 120} s",
+            "ssap_still_running": True,
+            "note": "SSAP was deliberately NOT killed: a long run may still be "
+                    "valid, and terminating it would discard the computation. "
+                    "Close it yourself, or call again with a larger timeout. "
+                    "Until it is closed, further runs will attach to this "
+                    "same instance.",
+        }
     return {"ok": True,
             "output": (p.stdout or "") + (p.stderr or ""),
             "elapsed_s": round(_t.time() - t0, 1)}
@@ -561,14 +586,14 @@ def run_verification(
     elif RUNNER is not None:
         righe = [
             f"if (-not (Get-Process ssap2010_64bit -ErrorAction SilentlyContinue)) {{",
-            f"  Start-Process -FilePath '{SSAP_EXE}' "
-            f"-WorkingDirectory '{SSAP_EXE.parent}' -WindowStyle Minimized",
+            f"  Start-Process -FilePath {_psq(SSAP_EXE)} "
+            f"-WorkingDirectory {_psq(SSAP_EXE.parent)} -WindowStyle Minimized",
             f"  Start-Sleep -Seconds 12",
             f"}}",
-            f"$env:SSAP_DIR = '{d}'",
-            f"$env:SSAP_NOME = '{model_name}'",
-            f"$env:SSAP_MAX_SECONDI = '{timeout}'",
-            f"& '{PYTHON_ELEVATO}' '{PACKAGE_DIR / 'corsa.py'}' 2>&1",
+            f"$env:SSAP_DIR = {_psq(d)}",
+            f"$env:SSAP_NOME = {_psq(model_name)}",
+            f"$env:SSAP_MAX_SECONDI = {_psq(int(timeout))}",
+            f"& {_psq(PYTHON_ELEVATO)} {_psq(PACKAGE_DIR / 'corsa.py')} 2>&1",
         ]
         r = _esegui_elevato(righe, timeout + 120)
     else:
