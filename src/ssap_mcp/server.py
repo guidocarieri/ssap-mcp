@@ -155,6 +155,7 @@ def create_model(
     layer_surfaces: list[list[list[float]]] | None = None,
     water_table: list[list[float]] | None = None,
     surcharges: list[dict] | None = None,
+    anchors: list[dict] | None = None,
 ) -> dict:
     """Create a complete SSAP model file set (.MOD + .DAT + .GEO + optional .FLD/.SVR)
     via the toolkit writer (ssap_writer.SlopeModel + write_all).
@@ -226,12 +227,28 @@ def create_model(
 
     wt = [(float(p[0]), float(p[1])) for p in water_table] if water_table else None
 
+    # Tiranti / chiodi (.TIR). La catena esisteva gia' — SlopeModel.anchors,
+    # write_tir(), la dichiarazione nel .MOD — ma questo tool non la esponeva:
+    # capacita' DORMIENTE, scoperta il 2026-08-01 provando a costruire un
+    # modello con opere di rinforzo. Chiavi: x, y, beta_deg, length, T_design,
+    # cemented_pct (opzionale, default 20%).
+    anc_objs = []
+    for a in (anchors or []):
+        anc_objs.append(ssap_writer.Anchor(
+            x=float(a["x"]), y=float(a["y"]),
+            beta_deg=float(a.get("beta_deg", a.get("beta", 0.0))),
+            length=float(a["length"]),
+            T_design=float(a.get("T_design", a.get("T", 0.0))),
+            cemented_pct=float(a.get("cemented_pct", 20.0)),
+        ))
+
     model = ssap_writer.SlopeModel(
         name=model_name,
         surfaces=surfaces,
         layers=layer_objs,
         water_table=wt,
         surcharges=sur_objs,
+        anchors=anc_objs,
     )
 
     paths = ssap_writer.write_all(model, out)
@@ -241,6 +258,7 @@ def create_model(
         "files": {k: str(p) for k, p in paths.items()},
         "n_layers": len(layer_objs),
         "n_surfaces_geo": len(surfaces),
+        "n_anchors": len(anc_objs),
         "validation_warnings": warnings,
         "engine_note": "Calculation method and search engine are NOT set here: "
                        "they live in the .PAR settings file. Use "
