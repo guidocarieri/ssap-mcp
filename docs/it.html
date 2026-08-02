@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ssap-mcp — pilotare SSAP2010 da un assistente IA</title>
+<style>
+:root { color-scheme: light dark; }
+body { max-width: 46rem; margin: 0 auto; padding: 2rem 1.2rem 6rem;
+       font: 16px/1.65 -apple-system, "Segoe UI", system-ui, sans-serif;
+       color: #1a1a1a; background: #fff; }
+h1, h2, h3 { line-height: 1.25; margin-top: 2.2em; }
+h1 { margin-top: .6em; }
+code, pre { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .9em; }
+code { background: #f2f1ef; padding: .1em .35em; border-radius: 4px; }
+pre { background: #f2f1ef; padding: 1rem; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; margin: 1.4em 0; }
+th, td { border: 1px solid #d8d5d0; padding: .5em .7em; text-align: left; vertical-align: top; }
+th { background: #f2f1ef; }
+blockquote { border-left: 4px solid #d8d5d0; margin: 1.4em 0; padding: .2em 0 .2em 1rem; color: #555; }
+a { color: #0a58ca; }
+img { max-width: 100%; }
+.lingue { font-size: .9em; margin-bottom: 2em; }
+@media (prefers-color-scheme: dark) {
+  body { color: #e8e6e3; background: #161614; }
+  code, pre, th { background: #232320; }
+  th, td { border-color: #3a3a37; }
+  blockquote { border-left-color: #3a3a37; color: #b0aca6; }
+  a { color: #7aa7ff; }
+}
+</style>
+</head>
+<body>
+<p class="lingue"><a href="index.html">This page in English</a> · <a href="https://github.com/guidocarieri/ssap-mcp">Repository su GitHub</a></p>
+<h1>ssap-mcp</h1>
+<p><em><a href="index.html">This page in English</a></em></p>
+<p>Un server <a href="https://modelcontextprotocol.io">MCP</a> che pilota <strong>SSAP2010</strong> — lo
+<em>Slope Stability Analysis Program</em> del Prof. Lorenzo Borselli — in modo che un
+assistente IA possa preparare un modello, scegliere il metodo di calcolo e il
+motore di ricerca, lanciare la verifica e leggere il fattore di sicurezza che ne
+risulta.</p>
+<blockquote>
+<p><strong>Non affiliato all'autore di SSAP.</strong> SSAP2010 è software gratuito del Prof.
+Lorenzo Borselli (<a href="https://www.ssap.eu">https://www.ssap.eu</a>), <em>non</em> è open source, e non ne è
+permessa la ridistribuzione. Questo repository non contiene <strong>nessuna parte di
+SSAP</strong>: pilota una copia che scarichi e installi tu.</p>
+</blockquote>
+<p><strong>Provato sui modelli di SSAP stesso.</strong> Tutti i <strong>20</strong> casi di verifica in
+<a href="tests/CAMPAGNA.md"><code>tests/CAMPAGNA.md</code></a> arrivano a un risultato — diciannove
+sono modelli distribuiti insieme a SSAP2010, quindi chiunque lo abbia installato
+può rifare l'intera campagna e controllare i numeri. Ogni fattore di sicurezza è
+letto dalla relazione finale, e le coppie si comportano come devono: tiranti su
+scarpata rocciosa <strong>+22,8%</strong>, liquefazione <strong>−44,2%</strong>, condizioni drenate contro
+non drenate <strong>−27,5%</strong>. Dove un confronto non regge, sta scritto: due sono
+marcati <em>non validi</em> e un risultato <em>non spiegato</em>, invece di essere tolti in
+silenzio.</p>
+<hr />
+<h2>⛔ Leggi prima questo: non è un modo di far girare SSAP senza schermo</h2>
+<p>È il limite più importante, e quello che si fraintende più facilmente, perciò sta
+scritto in parole povere prima di ogni altra cosa.</p>
+<p>In informatica un programma si dice <strong>headless</strong> (letteralmente «senza testa»)
+quando può girare senza schermo e senza nessuno davanti: lo si lancia da riga di
+comando, lavora in secondo piano, e può quindi girare su un server affittato,
+dentro un container, o di notte su una macchina dove nessuno ha fatto l'accesso.
+<strong>SSAP non è un programma di quel tipo, e questo server non lo rende tale.</strong></p>
+<p>SSAP è un programma con interfaccia grafica. Nella versione pubblica <strong>non ha né
+riga di comando, né modalità batch, né interfaccia di scripting</strong> — verificato
+sull'intero manuale di 511 pagine della rel. 5.2 e sul sito ufficiale. Di
+conseguenza a questo server servono, sullo stesso computer:</p>
+<ul>
+<li>SSAP2010 <strong>installato</strong> (si scarica da <a href="https://www.ssap.eu">https://www.ssap.eu</a>);</li>
+<li>una <strong>sessione desktop di Windows con l'utente collegato</strong>. Non una macchina
+  remota dove nessuno ha fatto l'accesso, non un container, non un servizio in
+  background: la finestra di SSAP deve esistere davvero su uno schermo, anche se
+  nessuno la sta guardando;</li>
+<li><strong>privilegi di amministratore</strong>, per il motivo spiegato nella tabella più sotto.</li>
+</ul>
+<p>La promessa, quindi, è <em>«nessuno deve stare lì a cliccare»</em>, <strong>non</strong> <em>«non serve
+uno schermo»</em>. Le due cose si somigliano e sono completamente diverse. Ciò che
+sparisce è l'operatore umano, non il desktop.</p>
+<p>Una cosa che deliberatamente <strong>non</strong> fa: non simula mai clic del mouse né
+pressioni di tasti. Le quattro operazioni che devono per forza passare dalla
+finestra di SSAP (carica modello, carica impostazioni, avvia verifica, produci
+relazione) sono eseguite mandando messaggi di Windows direttamente ai pulsanti
+(<code>PostMessage</code>/<code>BM_CLICK</code>). Il mouse, la tastiera e la finestra attiva restano
+tuoi mentre una verifica è in corso: puoi continuare a lavorare ad altro.</p>
+<h2>Come funziona</h2>
+<p>L'idea che rende possibile tutto il resto: <strong>a SSAP si danno istruzioni
+attraverso i suoi file, non attraverso i suoi menu.</strong> Il metodo di calcolo e il
+motore di ricerca sono scritti in chiaro dentro il file di impostazioni <code>.PAR</code>.
+Si possono scrivere lì direttamente, e SSAP obbedisce a quello che trova. La
+finestra serve soltanto a premere <em>avvio</em>.</p>
+<pre><code>create_model  →  set_analysis_options  →  run_verification  →  read_report
+   .MOD/.DAT/.GEO    scrive il .PAR       lancia SSAP        Fs + quale metodo
+                                                             è stato davvero usato
+</code></pre>
+<p>⛔ <strong>Non fidarti mai del file che hai scritto: controlla la relazione che SSAP ti
+ha riscritto.</strong> Se metti nel <code>.PAR</code> un valore che SSAP non accetta, viene
+ignorato <em>in silenzio</em>: nessun messaggio d'errore, nessun avviso, e la verifica
+gira con qualcosa di diverso da ciò che avevi chiesto. Per questo <code>read_report</code>
+estrae le righe <code>METODO DI CALCOLO</code> e <code>MOTORE DI RICERCA</code> dalla relazione finale,
+che sono l'unica dichiarazione attendibile di ciò che è stato realmente usato.
+Rileggerle non è una formalità: è l'unico modo di saperlo.</p>
+<p>⛔ <strong>I file <code>.tmp</code> e <code>temp_*.dxf</code> non sono i risultati.</strong> Sono istantanee prese
+mentre il calcolo è ancora in corso. Su una stessa identica verifica, un file
+temporaneo e la relazione finale differivano di 0,018 sul valore di Fs. La
+relazione vera viene scritta solo quando la si chiede, e solo dopo che il calcolo
+è finito.</p>
+<h2>Cosa serve prima di cominciare</h2>
+<p>Questo non è un programma che si scarica e si apre con un doppio clic. È un
+<strong>server con cui parla un assistente IA</strong>: da solo non ha finestre, non ha menu e
+non ha riga di comando, e non fa nulla finché un assistente non lo chiama. Qui
+sotto c'è la catena completa di ciò che serve, scritta per intero perché nessuno
+scopra a metà strada che gli manca un pezzo.</p>
+<table>
+<thead>
+<tr>
+<th>cosa serve</th>
+<th>perché serve</th>
+<th>nota</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Windows</strong></td>
+<td>SSAP2010 esiste solo per Windows, e questo server non fa altro che pilotare SSAP</td>
+<td>niente macOS, niente Linux, nemmeno dentro un container</td>
+</tr>
+<tr>
+<td><strong>SSAP2010, installato da te</strong></td>
+<td>questo repository non comprende SSAP e non gli è consentito comprenderlo: l'autore lo distribuisce di persona e non ne permette la ridistribuzione. Questo server pilota soltanto una copia che è già sul tuo computer</td>
+<td>download gratuito su <a href="https://www.ssap.eu">https://www.ssap.eu</a>. Sviluppato e provato sulla <strong>6.1 build 15998</strong></td>
+</tr>
+<tr>
+<td><strong>una sessione Windows con l'utente collegato</strong></td>
+<td>SSAP non ha riga di comando, quindi l'unico modo di avviare una verifica è premere un pulsante nella sua finestra — e quella finestra può esistere solo su una sessione desktop vera</td>
+<td>non funziona su un server senza schermo, come servizio in background, o su una macchina dove nessuno ha fatto l'accesso</td>
+</tr>
+<tr>
+<td><strong>privilegi di amministratore</strong></td>
+<td>SSAP gira con privilegi elevati. Windows vieta deliberatamente a un programma normale di mandare comandi alla finestra di uno elevato (è una protezione che si chiama UIPI), perciò un server non elevato semplicemente non riesce a premere i pulsanti di SSAP</td>
+<td>avvia il tuo client MCP come amministratore</td>
+</tr>
+<tr>
+<td><strong>Python 3.12 o successivo</strong></td>
+<td>il server è scritto in Python</td>
+<td><a href="https://www.python.org">https://www.python.org</a></td>
+</tr>
+<tr>
+<td><strong>uv</strong> (oppure pip)</td>
+<td>per installare le dipendenze</td>
+<td><a href="https://docs.astral.sh/uv/">https://docs.astral.sh/uv/</a></td>
+</tr>
+<tr>
+<td><strong>un client MCP</strong></td>
+<td>MCP è un protocollo: questo server risponde soltanto a richieste, non avvia mai niente da sé. Il client è il programma che lo chiama davvero</td>
+<td>per esempio Claude Desktop, Claude Code, o qualunque altro programma che parli MCP</td>
+</tr>
+<tr>
+<td><strong>un account presso un assistente IA che supporti MCP</strong></td>
+<td>al client serve un modello dietro, che decida cosa chiedere</td>
+<td>normalmente significa un <strong>abbonamento a pagamento</strong>, ed è un costo ricorrente reale</td>
+</tr>
+</tbody>
+</table>
+<p>⛔ <strong>Sulle ultime due righe è bene essere chiari.</strong> Senza un client MCP <em>e</em> un
+modello dietro, questo repository non fa assolutamente nulla: non ha un'interfaccia
+propria su cui ripiegare. E se quello che ti serve è eseguire una singola verifica,
+SSAP da solo la fa meglio e più in fretta di tutto questo: è stato progettato per
+quello, e la sua interfaccia è lo strumento giusto. Questo progetto si ripaga solo
+quando devi eseguire <em>molte</em> verifiche una dietro l'altra — ogni metodo contro ogni
+motore, per dire, oppure lo stesso pendio con venti insiemi di parametri — o quando
+la verifica deve stare dentro una filiera di elaborazione più lunga che è già
+automatizzata.</p>
+<p>Dipendenze installate in automatico: <code>mcp</code>, <code>ezdxf</code>, <code>numpy</code>, <code>laspy</code>,
+<code>matplotlib</code>.</p>
+<h2>Installazione</h2>
+<pre><code class="language-bash">git clone https://github.com/guidocarieri/ssap-mcp
+cd ssap-mcp
+uv sync
+</code></pre>
+<p>Poi registralo presso il tuo client MCP (i percorsi qui sotto sono esempi — usa i
+tuoi):</p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;ssap&quot;: {
+      &quot;command&quot;: &quot;uv&quot;,
+      &quot;args&quot;: [&quot;--directory&quot;, &quot;C:/percorso/di/ssap-mcp&quot;, &quot;run&quot;, &quot;ssap-mcp&quot;]
+    }
+  }
+}
+</code></pre>
+<p><strong>Avvia il client come amministratore</strong>, così il server eredita quei privilegi
+(nella tabella sopra c'è il perché servono). Se preferisci non confermare un
+avviso di sicurezza di Windows a ogni esecuzione, punta <code>SSAP_ELEVATED_RUNNER</code> a
+un tuo programma di appoggio che esegua uno script PowerShell elevato — è
+facoltativo, e il server funziona anche senza.</p>
+<h3>Variabili d'ambiente</h3>
+<table>
+<thead>
+<tr>
+<th>variabile</th>
+<th>valore predefinito</th>
+<th>significato</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SSAP_EXE</code></td>
+<td><code>C:\SSAP2010\ssap2010_64bit.exe</code></td>
+<td>dove si trova l'eseguibile di SSAP</td>
+</tr>
+<tr>
+<td><code>SSAP_PYTHON</code></td>
+<td>l'interprete in uso</td>
+<td>interprete usato per il programma di appoggio</td>
+</tr>
+<tr>
+<td><code>SSAP_ELEVATED_RUNNER</code></td>
+<td><em>(non impostata)</em></td>
+<td>programma facoltativo per ottenere i privilegi di amministratore senza avviso</td>
+</tr>
+<tr>
+<td><code>SSAP_EXAMPLES</code></td>
+<td>la cartella <code>examples/</code> inclusa</td>
+<td>dove cercare i progetti di esempio</td>
+</tr>
+</tbody>
+</table>
+<h2>Strumenti</h2>
+<p>Sono le operazioni che l'assistente può chiamare. I nomi in <code>codice</code> sono quelli
+che usa lui; tu non li digiti mai.</p>
+<table>
+<thead>
+<tr>
+<th>strumento</th>
+<th>cosa fa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>status</code></td>
+<td>dice se SSAP è installato, se il toolkit si è caricato, e se questo processo ha i privilegi di amministratore</td>
+</tr>
+<tr>
+<td><code>explore_point_cloud</code></td>
+<td>legge l'intestazione di una nuvola di punti LAS/LAZ — estensione, numero di punti, intervallo di quote, sistema di riferimento — prima di tentare qualcosa di più pesante</td>
+</tr>
+<tr>
+<td><code>extract_section_las</code></td>
+<td>ritaglia da una nuvola di punti un profilo del terreno in 2D, che diventa la geometria del pendio</td>
+</tr>
+<tr>
+<td><code>extract_section_dem</code></td>
+<td>lo stesso a partire da un modello digitale raster — <strong>non implementato</strong>: restituisce un errore esplicito e indica le alternative GDAL/PDAL</td>
+</tr>
+<tr>
+<td><code>analyze_section_dxf</code></td>
+<td>legge polilinee e livelli da una sezione che hai già disegnato in CAD</td>
+</tr>
+<tr>
+<td><code>create_model</code></td>
+<td>scrive i file del modello che SSAP legge: <code>.MOD</code>, <code>.DAT</code>, <code>.GEO</code>, più quelli facoltativi per falda, sovraccarichi, tiranti e rinforzi</td>
+</tr>
+<tr>
+<td><code>set_analysis_options</code></td>
+<td><strong>sceglie il metodo di calcolo e il motore di ricerca</strong>, scrivendoli nel file di impostazioni <code>.PAR</code></td>
+</tr>
+<tr>
+<td><code>run_verification</code></td>
+<td>l'esecuzione completa, senza clic umani: chiude l'eventuale SSAP aperto, controlla che le impostazioni appartengano a questo modello, avvia un'istanza pulita, attende, e restituisce il fattore di sicurezza minimo</td>
+</tr>
+<tr>
+<td><code>run_analysis</code></td>
+<td>la strada più vecchia, semi-manuale: apre SSAP con il modello caricato e lascia a te il pulsante di <em>avvio</em></td>
+</tr>
+<tr>
+<td><code>read_report</code></td>
+<td>legge la relazione finale e restituisce il fattore di sicurezza insieme al metodo e al motore <strong>realmente</strong> usati</td>
+</tr>
+<tr>
+<td><code>parameter_glossary</code></td>
+<td>spiega cosa significa ciascun parametro della relazione, citando la legenda che SSAP stesso stampa sotto ogni tabella</td>
+</tr>
+<tr>
+<td><code>parse_results</code></td>
+<td>legge i file DXF e PDF prodotti da un'esecuzione</td>
+</tr>
+<tr>
+<td><code>list_examples</code></td>
+<td>elenca i progetti di esempio inclusi qui</td>
+</tr>
+</tbody>
+</table>
+<h3>Metodi di calcolo e motori di ricerca</h3>
+<p>I numeri della prima colonna sono i <strong>codici</strong> da passare a
+<code>set_analysis_options</code> — gli stessi numeri che SSAP memorizza nel file <code>.PAR</code>.
+Sono stati verificati uno per uno lanciando ciascun valore e rileggendo il nome
+del metodo dalla relazione, perché le etichette scritte dentro i file di
+impostazioni più vecchi sono sbagliate.</p>
+<p><strong><code>method</code> — il metodo all'equilibrio limite con cui si calcola Fs:</strong></p>
+<table>
+<thead>
+<tr>
+<th>codice</th>
+<th>metodo</th>
+<th>secondo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td translate="no">1</td>
+<td translate="no"><code translate="no">Janbu rigorous</code></td>
+<td translate="no">Janbu, 1973</td>
+</tr>
+<tr>
+<td translate="no">2</td>
+<td translate="no"><code translate="no">Spencer</code></td>
+<td translate="no">Spencer, 1973</td>
+</tr>
+<tr>
+<td translate="no">3</td>
+<td translate="no"><code translate="no">Sarma I</code></td>
+<td translate="no">Sarma, 1973</td>
+</tr>
+<tr>
+<td translate="no">4</td>
+<td translate="no"><code translate="no">Morgenstern-Price</code></td>
+<td translate="no">Morgenstern &amp; Price, 1965</td>
+</tr>
+<tr>
+<td translate="no">5</td>
+<td translate="no"><code translate="no">Chen-Morgenstern</code></td>
+<td translate="no">Chen &amp; Morgenstern, 1983</td>
+</tr>
+<tr>
+<td translate="no">6</td>
+<td translate="no"><code translate="no">Sarma II</code></td>
+<td translate="no">Sarma, 1979</td>
+</tr>
+<tr>
+<td translate="no">7</td>
+<td translate="no"><code translate="no">Borselli</code></td>
+<td translate="no">Borselli, 2016</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>engine</code> — l'algoritmo che cerca la superficie critica:</strong></p>
+<table>
+<thead>
+<tr>
+<th>codice</th>
+<th>motore di ricerca</th>
+<th>secondo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td translate="no">1</td>
+<td translate="no"><code translate="no">Random Search</code></td>
+<td translate="no">Siegel, 1981</td>
+</tr>
+<tr>
+<td translate="no">2</td>
+<td translate="no"><code translate="no">Convex Random Search</code></td>
+<td translate="no">Chen, 1992</td>
+</tr>
+<tr>
+<td translate="no">3</td>
+<td translate="no"><code translate="no">Sniff Random Search 3.4</code></td>
+<td translate="no">Borselli, 1997-2025</td>
+</tr>
+<tr>
+<td translate="no">4</td>
+<td translate="no"><code translate="no">New Random Search 2.0</code></td>
+<td translate="no">Borselli, 2021-2025</td>
+</tr>
+<tr>
+<td translate="no">5</td>
+<td translate="no"><code translate="no">Mixed Engines Search 2.0</code></td>
+<td translate="no">Borselli, 2025-2026</td>
+</tr>
+</tbody>
+</table>
+<p>I nomi nella colonna centrale sono <strong>cognomi di autori</strong> e restano in inglese di
+proposito: sono le stringhe esatte che SSAP stampa nella relazione, e chi
+confronta le due cose deve vedere gli stessi caratteri. In particolare <strong>Price</strong>
+è il cognome di Vaughan Price, non un prezzo — un traduttore automatico lo rende
+«prezzo Morgentern», e «Sarma» diventa «Sarca» o «Sara».</p>
+<p>Si noti inoltre che <strong><code>Sarma I</code> e <code>Sarma II</code> sono due formulazioni diverse dello
+stesso autore</strong>, pubblicate a sei anni di distanza: è l'anno nella terza colonna
+a distinguerle, e non sono intercambiabili.</p>
+<p>⚠️ <strong>I file di impostazioni delle versioni più vecchie dichiarano intervalli
+sbagliati.</strong> Un <code>.PAR</code> prodotto da SSAP 5.x elenca meno metodi e meno motori di
+quanti il programma attuale ne accetti, quindi le sue etichette sono fuorvianti e
+non si possono usare come riferimento. Nel dubbio, rigeneralo: carica il <code>.MOD</code> in
+un SSAP aggiornato, salva di nuovo le impostazioni, e usa quel file come modello.</p>
+<h2>A cosa serve, e a cosa non serve</h2>
+<p>Il manuale (§ 2.6.6) avverte che <em>una verifica completa e affidabile può
+richiedere di provare più motori di ricerca in successione</em>. Fatto a mano
+significa una sessione per motore, e in pratica non lo fa quasi nessuno. Fatto in
+automatico costa tempo macchina invece di tempo umano, così provare ogni metodo
+contro ogni motore, ripetutamente, diventa una cosa che ci si può permettere.</p>
+<p>Due avvertenze che contano più di tutto il codice:</p>
+<ul>
+<li><strong>Ripetere una corsa non è un lusso.</strong> La ricerca della superficie critica è
+  pseudo-casuale: due esecuzioni identiche non restituiscono esattamente lo stesso
+  numero. In questa stessa campagna due configurazioni differivano di 0,004 — ben
+  dentro quella dispersione — il che significa che una sola corsa per
+  configurazione non può distinguere una differenza vera dal rumore. Conclusioni
+  tratte da una corsa sola si sono misurate ribaltarsi una volta ripetute.</li>
+<li><strong>L'automazione non migliora i dati in ingresso.</strong> Un solutore alimentato con
+  parametri irrealistici restituisce un numero calcolato perfettamente e
+  perfettamente sbagliato — solo più in fretta. Decidere la stratigrafia, i
+  parametri di resistenza e le condizioni idrauliche è lavoro del geologo, questo
+  strumento non ne fa nulla, e chi firma il risultato ne resta responsabile.</li>
+</ul>
+<h2>Riconoscimenti</h2>
+<p>SSAP2010 è sviluppato dal <strong>Prof. Lorenzo Borselli</strong> (Instituto de Geología /
+Facultad de Ingeniería, Universidad Autónoma de San Luis Potosí, Messico) ed è
+distribuito gratuitamente su <a href="https://www.ssap.eu">https://www.ssap.eu</a>. Tutto il merito dell'analisi
+in sé è suo; questo repository ne automatizza soltanto l'uso.</p>
+<h2>Licenza</h2>
+<p>MIT — vedi <a href="LICENSE">LICENSE</a>. La licenza copre solo questo codice, mai SSAP.</p>
+</body>
+</html>
