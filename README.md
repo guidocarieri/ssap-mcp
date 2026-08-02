@@ -1,7 +1,8 @@
 # ssap-mcp
 
-*[Questa pagina in italiano](README.it.md) — SSAP is written by an Italian author
-and most of its users are Italian, so this document exists in both languages.*
+*[Questa pagina in italiano](README.it.md) — this document exists in both
+languages. English is the working language here; the Italian page is a real
+translation, not a generated one.*
 
 📖 **If you are going to read this through an automatic translator, read it
 [on the documentation site](https://guidocarieri.github.io/ssap-mcp/) instead.**
