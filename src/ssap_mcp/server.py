@@ -472,12 +472,40 @@ def _esegui_elevato(righe: list[str], timeout_s: int) -> dict:
     return {"ok": False, "error": f"nessuna uscita entro {timeout_s} s"}
 
 
-def _run_here(model_dir: Path, model_name: str, timeout_s: int) -> dict:
+def _chiudi_ssap() -> None:
+    """Chiude SSAP, se aperto, per partire da uno stato pulito.
+
+    ⛔ Non e' pignoleria: SSAP ACCUMULA STATO fra una verifica e l'altra —
+    modello caricato, impostazioni, dialoghi residui — e riusare la stessa
+    istanza per corse consecutive fa guastare una verifica qualsiasi, non
+    sempre la stessa.
+
+    Misurato il 2026-08-02 su una campagna di 19 modelli: i fallimenti si
+    SPOSTAVANO da un caso all'altro fra due passate, con gli stessi file
+    identici. Un difetto del modello sarebbe stato sempre lo stesso. Lo stesso
+    modello che falliva con «Invalid floating point operation» su un'istanza
+    riusata ha chiuso regolarmente su un'istanza pulita.
+
+    Chi lavora a mano non lo vede mai: fa una verifica per volta e chiude.
+    Emerge solo incatenando le corse, cioe' solo automatizzando — ed e' la
+    ragione per cui una campagna, senza questo, non e' RIPETIBILE.
+    """
+    import subprocess
+    subprocess.run(["taskkill", "/F", "/IM", "ssap2010_64bit.exe"],
+                   capture_output=True, text=True)
+    import time as _t
+    _t.sleep(2)
+
+
+def _run_here(model_dir: Path, model_name: str, timeout_s: int,
+              fresh_instance: bool = True) -> dict:
     """Run the verification in this process tree (already elevated)."""
     import subprocess
     import time as _t
 
     t0 = _t.time()
+    if fresh_instance:
+        _chiudi_ssap()
     try:
         chk = subprocess.run(
             ["tasklist", "/FI", "IMAGENAME eq ssap2010_64bit.exe"],
@@ -596,6 +624,7 @@ def run_verification(
     model_dir: str,
     model_name: str,
     timeout: int = 1800,
+    fresh_instance: bool = True,
 ) -> dict:
     """Esegue una VERIFICA GLOBALE SSAP dall'inizio alla fine, SENZA CLICK UMANI.
 
@@ -652,9 +681,14 @@ def run_verification(
             }
 
     if _is_elevated():
-        r = _run_here(d, model_name, timeout)
+        r = _run_here(d, model_name, timeout, fresh_instance)
     elif RUNNER is not None:
-        righe = [
+        righe = []
+        if fresh_instance:
+            # stessa ragione di _chiudi_ssap(): mai riusare un'istanza gia' usata
+            righe += ["Stop-Process -Name ssap2010_64bit -Force "
+                      "-ErrorAction SilentlyContinue", "Start-Sleep -Seconds 2"]
+        righe += [
             f"if (-not (Get-Process ssap2010_64bit -ErrorAction SilentlyContinue)) {{",
             # ⛔ NON minimizzata: una finestra iconificata ha
             # IsWindowVisible == False e i suoi controlli non sono pilotabili.

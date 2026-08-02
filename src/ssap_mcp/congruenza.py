@@ -32,6 +32,15 @@ ETICHETTE_X = (
     "LIMITE1 SUPERIORE M",
     "LIMITE2 SUPERIORE- M",
     "LIMITE2 SUPERIORE M",
+    # ⛔ Ostacolo interno. Aggiunti il 2026-08-02 dopo un FALSO VERDE di questo
+    # stesso controllo: tre .par derivati da un template dichiaravano X1=1966 e
+    # X2=2031 su modelli estesi fra 10 e 35 m — coordinate rimaste da un altro
+    # cantiere — e il controllo li aveva promossi, perche' guardava solo i due
+    # limiti superiori. Le verifiche non chiudevano mai, e la causa era li'.
+    # Un controllo di congruenza incompleto e' peggio di nessun controllo:
+    # da' un verde che si crede.
+    "X1 - M",
+    "X2 - M",
 )
 
 
