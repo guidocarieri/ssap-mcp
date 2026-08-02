@@ -179,25 +179,29 @@ the report, because the labels written inside older settings files are wrong.
 
 **`method` — the limit-equilibrium method used to compute Fs:**
 
-| code | method |
-|---|---|
-| 1 | Janbu rigorous |
-| 2 | Spencer |
-| 3 | Sarma I |
-| 4 | Morgenstern-Price |
-| 5 | Chen-Morgenstern |
-| 6 | Sarma II |
-| 7 | Borselli 2016 |
+| code | method | after |
+|---|---|---|
+| 1 | Janbu rigorous | Janbu, 1973 |
+| 2 | Spencer | Spencer, 1973 |
+| 3 | Sarma I | Sarma, 1973 |
+| 4 | Morgenstern-Price | Morgenstern & Price, 1965 |
+| 5 | Chen-Morgenstern | Chen & Morgenstern, 1983 |
+| 6 | Sarma II | Sarma, 1979 |
+| 7 | Borselli | Borselli, 2016 |
+
+Note that **Sarma I and Sarma II are two different formulations by the same
+author**, published six years apart — the year in the third column is what tells
+them apart, and they are not interchangeable.
 
 **`engine` — the algorithm that searches for the critical surface:**
 
-| code | search engine |
-|---|---|
-| 1 | Random Search |
-| 2 | Convex Random Search |
-| 3 | Sniff Random Search |
-| 4 | New Random Search |
-| 5 | Mixed Engines Search |
+| code | search engine | after |
+|---|---|---|
+| 1 | Random Search | Siegel, 1981 |
+| 2 | Convex Random Search | Chen, 1992 |
+| 3 | Sniff Random Search 3.4 | Borselli, 1997-2025 |
+| 4 | New Random Search 2.0 | Borselli, 2021-2025 |
+| 5 | Mixed Engines Search 2.0 | Borselli, 2025-2026 |
 
 ⚠️ **Settings files from older versions declare the wrong ranges.** A `.PAR`
 produced by SSAP 5.x lists fewer methods and engines than the current program
