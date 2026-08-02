@@ -10,6 +10,14 @@ engine, run the verification and read the resulting factor of safety.
 > its redistribution is not permitted. This repository contains **no part of
 > SSAP**: it drives a copy you install yourself.
 
+**Tested against SSAP's own models.** All **20** verification cases in
+[`tests/CAMPAGNA.md`](tests/CAMPAGNA.md) converge — nineteen of them models
+shipped with SSAP2010, so anyone with it installed can repeat the campaign.
+Every factor of safety there is read from the final report, and the pairs behave
+as they should: anchors on a rock slope **+22.8%**, liquefaction **−44.2%**,
+drained against undrained **−27.5%**. Two comparisons are marked as *not valid*
+and one result as *unexplained*, rather than tidied away.
+
 ---
 
 ## ⛔ Read this first: it is NOT headless
