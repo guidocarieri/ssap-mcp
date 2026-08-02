@@ -39,9 +39,9 @@ img { max-width: 100%; }
 <a href="https://guidocarieri.github.io/ssap-mcp/it.html">sito della documentazione</a>:
 stesso testo, ma lì i nomi degli autori sono marcati in modo che il traduttore
 non li tocchi. Da un README di GitHub quella marcatura viene rimossa — misurato —
-e il traduttore rende <code>Morgenstern-Price</code> come «prezzo Morgentern», come se
-<strong>Price</strong> fosse un prezzo invece del cognome di Vaughan Price. Un metodo con quel
-nome non esiste.</p>
+e il traduttore rende <span translate="no">Morgenstern-Price</span> come «prezzo
+Morgentern», come se <strong>Price</strong> fosse un prezzo invece del cognome di Vaughan
+Price. Un metodo con quel nome non esiste.</p>
 <p translate="yes">Un server <a href="https://modelcontextprotocol.io">MCP</a> che pilota <strong>SSAP2010</strong> — lo
 <em>Slope Stability Analysis Program</em> del Prof. Lorenzo Borselli — in modo che un
 assistente IA possa preparare un modello, scegliere il metodo di calcolo e il
@@ -390,14 +390,10 @@ impostazioni più vecchi sono sbagliate.</p>
 </tr>
 </tbody>
 </table>
-<p translate="yes">I nomi nella colonna centrale sono <strong>cognomi di autori</strong> e restano in inglese di
-proposito: sono le stringhe esatte che SSAP stampa nella relazione, e chi
-confronta le due cose deve vedere gli stessi caratteri. In particolare <strong>Price</strong>
-è il cognome di Vaughan Price, non un prezzo — un traduttore automatico lo rende
-«prezzo Morgentern», e «Sarma» diventa «Sarca» o «Sara».</p>
-<p translate="yes">Si noti inoltre che <strong><code>Sarma I</code> e <code>Sarma II</code> sono due formulazioni diverse dello
-stesso autore</strong>, pubblicate a sei anni di distanza: è l'anno nella terza colonna
-a distinguerle, e non sono intercambiabili.</p>
+<p translate="yes">Si noti che <span translate="no">Sarma I</span> e
+<span translate="no">Sarma II</span> sono <strong>due formulazioni diverse dello stesso
+autore</strong>, pubblicate a sei anni di distanza: è l'anno nella terza colonna a
+distinguerle, e non sono intercambiabili.</p>
 <p translate="yes">⚠️ <strong>I file di impostazioni delle versioni più vecchie dichiarano intervalli
 sbagliati.</strong> Un <code>.PAR</code> prodotto da SSAP 5.x elenca meno metodi e meno motori di
 quanti il programma attuale ne accetti, quindi le sue etichette sono fuorvianti e

@@ -6,9 +6,9 @@
 [sito della documentazione](https://guidocarieri.github.io/ssap-mcp/it.html):
 stesso testo, ma lì i nomi degli autori sono marcati in modo che il traduttore
 non li tocchi. Da un README di GitHub quella marcatura viene rimossa — misurato —
-e il traduttore rende `Morgenstern-Price` come «prezzo Morgentern», come se
-**Price** fosse un prezzo invece del cognome di Vaughan Price. Un metodo con quel
-nome non esiste.
+e il traduttore rende <span translate="no">Morgenstern-Price</span> come «prezzo
+Morgentern», come se **Price** fosse un prezzo invece del cognome di Vaughan
+Price. Un metodo con quel nome non esiste.
 
 Un server [MCP](https://modelcontextprotocol.io) che pilota **SSAP2010** — lo
 *Slope Stability Analysis Program* del Prof. Lorenzo Borselli — in modo che un
@@ -215,15 +215,10 @@ impostazioni più vecchi sono sbagliate.
 | 4 | <code translate="no">New Random Search 2.0</code> | Borselli, 2021-2025 |
 | 5 | <code translate="no">Mixed Engines Search 2.0</code> | Borselli, 2025-2026 |
 
-I nomi nella colonna centrale sono **cognomi di autori** e restano in inglese di
-proposito: sono le stringhe esatte che SSAP stampa nella relazione, e chi
-confronta le due cose deve vedere gli stessi caratteri. In particolare **Price**
-è il cognome di Vaughan Price, non un prezzo — un traduttore automatico lo rende
-«prezzo Morgentern», e «Sarma» diventa «Sarca» o «Sara».
-
-Si noti inoltre che **`Sarma I` e `Sarma II` sono due formulazioni diverse dello
-stesso autore**, pubblicate a sei anni di distanza: è l'anno nella terza colonna
-a distinguerle, e non sono intercambiabili.
+Si noti che <span translate="no">Sarma I</span> e
+<span translate="no">Sarma II</span> sono **due formulazioni diverse dello stesso
+autore**, pubblicate a sei anni di distanza: è l'anno nella terza colonna a
+distinguerle, e non sono intercambiabili.
 
 ⚠️ **I file di impostazioni delle versioni più vecchie dichiarano intervalli
 sbagliati.** Un `.PAR` prodotto da SSAP 5.x elenca meno metodi e meno motori di
