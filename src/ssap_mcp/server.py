@@ -240,6 +240,7 @@ def create_model(
             length=float(a["length"]),
             T_design=float(a.get("T_design", a.get("T", 0.0))),
             cemented_pct=float(a.get("cemented_pct", 20.0)),
+            K_riduzione_testa=float(a.get("K", a.get("K_riduzione_testa", 0.60))),
         ))
 
     model = ssap_writer.SlopeModel(
@@ -764,6 +765,47 @@ def run_verification(
         "elapsed_s": r["elapsed_s"],
         "log": out,
         "nota": "Fs letto dal REPORT di fine corsa, non dai file temporanei",
+    }
+
+
+@mcp.tool()
+def parameter_glossary(table: str = "") -> dict:
+    """What every SSAP parameter means — as SSAP itself declares it.
+
+    Nothing here is inferred. Every entry is taken from the «LEGENDA SIMBOLI»
+    that SSAP prints under each table of its verification report. That report
+    is the authoritative source: for the calculation method, for the search
+    engine, and for the meaning of the fields too.
+
+    Why this tool exists: the reference manual is still rel. 5.2 (Feb 2023)
+    while the program is at 6.1, and it does not list the fields of the model
+    files at all — of the .PAR it only says it «does not need to be edited».
+    Anyone writing those files programmatically is left without documentation
+    and ends up guessing. That happened with the seventh column of the .TIR,
+    taken for a pullout coefficient when it is the head-force reduction
+    coefficient K. Reading the legend would have settled it.
+
+    Pass `table` to filter (substring, case-insensitive), e.g. "tiranti".
+    """
+    from .glossario import GLOSSARIO, CONTESTO_TIRANTI
+    if table:
+        q = table.lower()
+        sel = {k: v for k, v in GLOSSARIO.items() if q in k.lower()}
+        if not sel:
+            return {"ok": False,
+                    "error": f"nessuna tabella contiene «{table}»",
+                    "disponibili": sorted(GLOSSARIO)}
+    else:
+        sel = GLOSSARIO
+    return {
+        "ok": True,
+        "fonte": "LEGENDA SIMBOLI dei report di verifica SSAP 6.1 (build 15998) "
+                 "— verbatim, nessuna voce dedotta",
+        "tabelle": sel,
+        "contesto_tiranti": CONTESTO_TIRANTI,
+        "nota": "Il manuale rel. 5.2 non documenta questi campi. Se una build "
+                "nuova ne aggiunge, si rileggono dal report: "
+                "python -m ssap_mcp.glossario <cartella dei report>",
     }
 
 

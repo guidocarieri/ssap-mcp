@@ -77,14 +77,19 @@ class Anchor:
     y: float            # y testa
     beta_deg: float     # angolo orizzontale (positivo = elevazione)
     length: float       # lunghezza totale (m)
-    T_design: float     # resistenza progetto (kN/m)
-    cemented_pct: float = 20.0  # % lunghezza cementata
-    # 7a colonna, scritta da SSAP 6.1 e NON documentata nel manuale rel. 5.2.
-    # Vale 0.60 in tutti i file di tutte le commesse esaminate (2024-2025), con
-    # parametri di progetto molto diversi: e' un default del programma.
-    # 🔴 Significato non accertato; ipotesi non verificata: coefficiente di
-    # interazione allo sfilamento, analogo al `fb` delle geogriglie.
-    pullout_coeff: float = 0.60
+    T_design: float     # T  — tensione di progetto (kN/m)
+    cemented_pct: float = 20.0  # Lc — % lunghezza cementata
+    # K — Coefficiente di riduzione della Forza in Testa all'Ancoraggio (-).
+    #
+    # 7a colonna del .TIR, scritta da SSAP 6.1 e NON documentata nel manuale
+    # rel. 5.2. Il significato NON si deduce dai file: e' dichiarato dal
+    # PROGRAMMA nella «LEGENDA SIMBOLI» che chiude la TABELLA TIRANTI/ANCORAGGI
+    # di ogni report di verifica —
+    #     K(-) : Coefficiente riduzione Forza in Testa Ancoraggio
+    # ⛔ Una precedente ipotesi (coefficiente di sfilamento, analogo al `fb`
+    # dei geosintetici) era SBAGLIATA: dedotta per analogia invece che letta.
+    # Il report e' la fonte, come per il metodo e il motore di ricerca.
+    K_riduzione_testa: float = 0.60
 
 
 @dataclass
@@ -179,13 +184,15 @@ def write_tir(model: SlopeModel, out_dir: Path) -> Path | None:
     12/2024-10/2025): tutti i file dal dic 2024 in poi hanno 7 colonne, tutti
     quelli fino al 2022 ne hanno 6.
 
-    🔴 Il significato della settima NON e' documentato in nessuna fonte
-    disponibile. Vale pero' `0.60` in TUTTI i file di TUTTE le commesse, con
-    parametri di progetto molto diversi (T da 5 a 98 kN/m, L da 3 a 31 m, beta
-    da -15 a -55 gradi): e' dunque un DEFAULT scritto dal programma, non una
-    scelta di progetto. Ipotesi NON verificata: l'analogo del coefficiente `fb`
-    di interazione suolo-rinforzo allo sfilamento, documentato per le
-    geogriglie, per cui 0,60 e' un valore tipico.
+    La settima colonna e' **K — Coefficiente di riduzione della Forza in Testa
+    all'Ancoraggio**. Non e' nel manuale: lo dichiara il PROGRAMMA, nella
+    «LEGENDA SIMBOLI» che chiude la TABELLA TIRANTI/ANCORAGGI di ogni report:
+        K(-) : Coefficiente riduzione Forza in Testa Ancoraggio
+    Non e' un default da lasciare com'e': si sceglie con criterio, come T e Lc.
+
+    ⛔ Prima di leggere il report l'avevo dedotto per ANALOGIA (coefficiente di
+    sfilamento, come il `fb` dei geosintetici) — ed era sbagliato. Le colonne
+    non si indovinano dai valori: si leggono dalla legenda che SSAP stampa.
     """
     if not model.anchors:
         return None
@@ -193,7 +200,7 @@ def write_tir(model: SlopeModel, out_dir: Path) -> Path | None:
     lines = [
         f"  {a.x:>10.4f} {a.y:>10.4f} {a.beta_deg:>8.2f} "
         f"{a.length:>8.2f} {a.T_design:>10.2f} {a.cemented_pct:>6.1f} "
-        f"{a.pullout_coeff:>6.2f}"
+        f"{a.K_riduzione_testa:>6.2f}"
         for a in model.anchors
     ]
     out.write_text("\n".join(lines) + "\n", encoding="ascii")

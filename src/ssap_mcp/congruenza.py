@@ -40,7 +40,13 @@ def estensione_modello(dat: pathlib.Path) -> tuple[float, float, float, float]:
     xs, ys = [], []
     for riga in dat.read_text(encoding="latin-1", errors="replace").splitlines():
         campi = riga.split()
-        if len(campi) != 2:
+        # ⛔ Alcuni .DAT marcano le righe di coordinate con un '@' iniziale
+        # (es. «@   0.00   19.95»). Pretendere esattamente due campi le
+        # scartava TUTTE, e il modello risultava senza geometria: misurato il
+        # 2026-08-02 su un modello con geogriglie degli esempi di SSAP.
+        if campi and campi[0] in ("@", "&", "*"):
+            campi = campi[1:]
+        if len(campi) < 2:
             continue
         try:
             x, y = float(campi[0]), float(campi[1])
