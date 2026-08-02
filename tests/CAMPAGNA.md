@@ -1,16 +1,25 @@
 # Verification campaign on SSAP's own example models
 
-Nineteen models shipped with SSAP2010, plus one built from scratch, run end-to-end through this server.
-Not synthetic cases: the files are the ones the author distributes, in
-`C:\SSAP2010\pendii`, so anyone with SSAP installed can repeat this.
+Nineteen models shipped with SSAP2010, plus one built from scratch, run from
+beginning to end through this server. These are not made-up test cases: the files
+are the ones the author distributes, in `C:\SSAP2010\pendii`, so anyone who has
+SSAP installed can repeat every line of this table and check the numbers.
 
-Every Fs below is read from the **final report**, which is the only
-authoritative statement of what SSAP actually computed — never from the
-`.tmp` files, which are mid-run snapshots.
+**Fs** is the factor of safety: the ratio between the strength available along a
+sliding surface and the strength required to keep it in place. Below 1 the slope
+does not hold. The number reported for each case is the *minimum* Fs found, that
+is the most critical surface the search engine managed to find.
 
-Settings: 5000 surfaces, local-Fs and fluid-pressure maps **off** (they are a
-different and far heavier computation, not needed for a factor of safety), each
-run on a **freshly started SSAP instance**.
+Every Fs below is read from the **final report**, which is the only trustworthy
+statement of what SSAP actually computed — never from the `.tmp` files, which are
+snapshots taken while the computation was still running.
+
+Settings used throughout: 5000 trial surfaces; the maps of local Fs and of fluid
+pressure switched **off** (they are a separate and far heavier computation, and
+none of it is needed to obtain a factor of safety); and every run started on a
+**freshly opened SSAP**, because SSAP keeps the previous model, settings and open
+dialogs in memory, and a second run inside the same instance does not start from
+a clean state.
 
 ## Results — 20 of 20
 
@@ -51,12 +60,14 @@ run on a **freshly started SSAP instance**.
   same settings. The cleanest pair of the campaign.
 - **Water table in rock** — 0.9138 dry against 0.1490 wet, on the same slope with
   the same mesh and anchors.
-- ⛔ `02a` vs `02b` is **not** a valid comparison: 7 layers against 4. The numbers
-  are there, the meaning is not.
-- 🔴 `05b` (with mesh) reads **lower** than `05a` (anchors only). A reinforcement
-  lowering Fs is counter-intuitive and is **not explained** here: the two models
-  may differ by more than the mesh, or the mesh may move the critical surface to
-  a different mechanism. Recorded as open rather than glossed over.
+- ⛔ `02a` against `02b` is **not** a valid comparison: one model has 7 layers and
+  the other 4, so the difference between the two numbers cannot be attributed to
+  the works. The figures are correct, the comparison is meaningless.
+- 🔴 `05b` (with wire mesh) reads **lower** than `05a` (anchors only). A
+  reinforcement that lowers Fs is counter-intuitive, and it is **not explained**
+  here: the two models may differ by more than the mesh alone, or the mesh may
+  push the critical surface onto a different failure mechanism. It is written
+  down as an open question instead of being left out.
 
 ## `esempio4` — a wrong diagnosis, corrected
 
