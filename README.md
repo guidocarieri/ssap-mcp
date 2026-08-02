@@ -1,9 +1,15 @@
 # ssap-mcp
 
 *[Questa pagina in italiano](README.it.md) — SSAP is written by an Italian author
-and most of its users are Italian, so this document exists in both languages.
-Please read the Italian page rather than machine-translating this one: the method
-names are surnames, and translation turns Price into a price.*
+and most of its users are Italian, so this document exists in both languages.*
+
+📖 **If you are going to read this through an automatic translator, read it
+[on the documentation site](https://guidocarieri.github.io/ssap-mcp/) instead.**
+Same text, but there the author names are marked so that translators leave them
+alone. GitHub strips that marking from a README — measured — and a translator
+then turns `Morgenstern-Price` into *"prezzo Morgentern"*, as though **Price**
+were a price rather than the surname of Vaughan Price. A method by that name does
+not exist.
 
 An [MCP](https://modelcontextprotocol.io) server that drives **SSAP2010** — the
 *Slope Stability Analysis Program* by Prof. Lorenzo Borselli — so that an AI

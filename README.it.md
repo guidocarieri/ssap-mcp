@@ -2,6 +2,14 @@
 
 *[This page in English](README.md)*
 
+📖 Se leggi queste pagine con un traduttore automatico, usa il
+[sito della documentazione](https://guidocarieri.github.io/ssap-mcp/it.html):
+stesso testo, ma lì i nomi degli autori sono marcati in modo che il traduttore
+non li tocchi. Da un README di GitHub quella marcatura viene rimossa — misurato —
+e il traduttore rende `Morgenstern-Price` come «prezzo Morgentern», come se
+**Price** fosse un prezzo invece del cognome di Vaughan Price. Un metodo con quel
+nome non esiste.
+
 Un server [MCP](https://modelcontextprotocol.io) che pilota **SSAP2010** — lo
 *Slope Stability Analysis Program* del Prof. Lorenzo Borselli — in modo che un
 assistente IA possa preparare un modello, scegliere il metodo di calcolo e il
