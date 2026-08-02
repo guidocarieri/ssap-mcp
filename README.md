@@ -26,9 +26,11 @@ engine, run the verification and read the resulting factor of safety.
 [`tests/CAMPAGNA.md`](tests/CAMPAGNA.md) reach a result — nineteen of them are
 models shipped with SSAP2010, so anyone who has it installed can repeat the whole
 campaign and check the numbers. Every factor of safety is read from the final
-report, and the pairs behave as they should: anchors on a rock slope **+22.8%**,
-liquefaction **−44.2%**, drained against undrained **−27.5%**. Where a comparison
-is not sound it says so: two of them are marked *not valid* and one result
+report, and the pairs move as they should: anchors on a rock slope **+22.8%**,
+liquefaction **−44.2%**, one layer taken in total instead of effective stresses
+**−27.5%**. Each figure is a **single run** of a pseudo-random search: the sign
+and the order of magnitude hold, the last digit does not. Where a comparison is
+not sound it says so: two of them are marked *not valid* and one result
 *unexplained*, instead of being quietly left out.
 
 ---

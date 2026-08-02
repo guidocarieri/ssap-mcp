@@ -28,12 +28,12 @@ a clean state.
 | `07a_terra_armata` | geogrids + water table + surcharges | **1.8161** |
 | `08b_gabbionata` | gabion wall + geosynthetic | **1.6476** |
 | `08a_muro_tiranti` | gravity wall as a lens + anchors | **1.6224** |
-| `04a_discarica_DRENATA` | **drained** conditions (c′, φ′) | **1.4539** |
-| `07b_geogriglie_nondren` | geogrids + undrained | **1.3926** |
+| `04a_discarica_DRENATA` | third layer in **effective** stresses (c′, φ′) | **1.4539** |
+| `07b_geogriglie_nondren` | geogrids, layers in total stresses | **1.3926** |
 | `06_complesso_13strati` | **13 layers**, Hoek-Brown, piles, anchors, surcharges | **1.2230** |
 | `02a_pali_tiranti_CON` | piles + anchors + Hoek-Brown + water table | **1.1376** |
 | `09b_liquefazione_NO` | same model, liquefaction flag off | **1.1304** |
-| `04b_discarica_NONDRENATA` | **undrained** conditions (cu) | **1.0545** |
+| `04b_discarica_NONDRENATA` | same, third layer in **total** stresses (cu) | **1.0545** |
 | `10_modello_mio` | **built from scratch**: loose cover, silt, Hoek-Brown rock, water table, 3 passive bolts | **1.0305** |
 | `01a_tiranti_roccia_CON` | Hoek-Brown rock + anchors | **1.0120** |
 | `03a_micropali_COMPLETO` | piles + anchors + undrained | **1.0061** |
@@ -50,8 +50,13 @@ a clean state.
 
 - **Liquefaction** — 0.6308 with, 1.1304 without: **−44.2%**, on models identical
   but for that one flag.
-- **Drained vs undrained** — 1.4539 against 1.0545, **−27.5%**: same geometry,
-  c′φ′ against cu. Both regimes are driven correctly.
+- **Effective against total stresses** — 1.4539 against 1.0545, **−27.5%**.
+  ⛔ Read the two `.GEO` files before calling this "drained against undrained":
+  they differ in **one line out of three layers**. The third layer goes from
+  `φ 23.0° · c′ 8.0` to `φ 0 · c 0 · cu 100`, while the first two stay in
+  effective stresses in *both* models. So what is measured is one layer changing
+  regime, not a whole analysis changing regime — the two are not the same claim,
+  and the second one would be wrong.
 - **Reinforcement** — bare slope 0.8795, with piles 1.0017, with piles and
   anchors 1.0061: **+13.9%**. Note that piles alone and piles+anchors differ by
   0.004, which is **inside the scatter** of a pseudo-random search: with a single

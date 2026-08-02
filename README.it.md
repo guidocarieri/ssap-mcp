@@ -25,11 +25,12 @@ risulta.
 [`tests/CAMPAGNA.md`](tests/CAMPAGNA.md) arrivano a un risultato — diciannove
 sono modelli distribuiti insieme a SSAP2010, quindi chiunque lo abbia installato
 può rifare l'intera campagna e controllare i numeri. Ogni fattore di sicurezza è
-letto dalla relazione finale, e le coppie si comportano come devono: tiranti su
-scarpata rocciosa **+22,8%**, liquefazione **−44,2%**, condizioni drenate contro
-non drenate **−27,5%**. Dove un confronto non regge, sta scritto: due sono
-marcati *non validi* e un risultato *non spiegato*, invece di essere tolti in
-silenzio.
+letto dalla relazione finale, e le coppie si muovono come devono: tiranti su
+scarpata rocciosa **+22,8%**, liquefazione **−44,2%**, uno strato preso in
+tensioni totali anziché efficaci **−27,5%**. Ogni cifra è **una sola corsa** di
+una ricerca pseudo-casuale: il segno e l'ordine di grandezza tengono, l'ultima
+cifra no. Dove un confronto non regge, sta scritto: due sono marcati *non validi*
+e un risultato *non spiegato*, invece di essere tolti in silenzio.
 
 ---
 
