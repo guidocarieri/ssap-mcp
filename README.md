@@ -69,6 +69,32 @@ snapshots. A difference of 0.018 on Fs was measured between a temporary file
 and the report of the very same verification. The report is written only on
 request, and only once the computation has finished.
 
+## What you need before you start
+
+This is not a program you double-click. It is a **server that an AI assistant
+talks to**, so it only does something once there is an assistant on the other
+end. The full chain, stated plainly so nobody discovers it halfway through:
+
+| you need | why | note |
+|---|---|---|
+| **Windows** | SSAP2010 is Windows-only | no macOS, no Linux, not even in a container |
+| **SSAP2010 installed** | this server does not contain it and cannot | download from <https://www.ssap.eu>. Developed against **6.1 build 15998** |
+| an **interactive desktop session** | SSAP is driven through its window | not a headless server, not a service, not a detached session |
+| **administrator rights** | SSAP runs elevated; by Windows UIPI a non-elevated process cannot drive its window | start your MCP client as administrator |
+| **Python ≥ 3.12** | the server is written in Python | <https://www.python.org> |
+| **uv** (or pip) | installs the dependencies | <https://docs.astral.sh/uv/> |
+| **an MCP client** | it is what actually calls the tools | e.g. Claude Desktop, Claude Code, or any client that speaks MCP |
+| **an account with an AI assistant that supports MCP** | the client needs a model behind it | this is usually a **paid subscription**, and it is not free |
+
+⛔ **Be clear about the last two.** Without an MCP client and a model behind it,
+this repository does nothing at all: there is no command line and no interface
+of its own. If you only want to run SSAP, SSAP already does that better on its
+own — this exists for people who need to run *many* verifications in sequence,
+or to place SSAP inside a longer chain of processing.
+
+Dependencies installed automatically: `mcp`, `ezdxf`, `numpy`, `laspy`,
+`matplotlib`.
+
 ## Install
 
 ```bash
