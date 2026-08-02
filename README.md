@@ -1,5 +1,10 @@
 # ssap-mcp
 
+*[Questa pagina in italiano](README.it.md) — SSAP is written by an Italian author
+and most of its users are Italian, so this document exists in both languages.
+Please read the Italian page rather than machine-translating this one: the method
+names are surnames, and translation turns Price into a price.*
+
 An [MCP](https://modelcontextprotocol.io) server that drives **SSAP2010** — the
 *Slope Stability Analysis Program* by Prof. Lorenzo Borselli — so that an AI
 assistant can prepare a model, choose the calculation method and the search
