@@ -33,27 +33,27 @@ img { max-width: 100%; }
 </head>
 <body>
 <p class="lingue"><a href="it.html">Questa pagina in italiano</a> · <a href="https://github.com/guidocarieri/ssap-mcp">Repository on GitHub</a></p>
-<h1>ssap-mcp</h1>
-<p><em><a href="it.html">Questa pagina in italiano</a> — SSAP is written by an Italian author
+<h1 translate="yes">ssap-mcp</h1>
+<p translate="yes"><em><a href="it.html">Questa pagina in italiano</a> — SSAP is written by an Italian author
 and most of its users are Italian, so this document exists in both languages.</em></p>
-<p>📖 <strong>If you are going to read this through an automatic translator, read it
+<p translate="yes">📖 <strong>If you are going to read this through an automatic translator, read it
 <a href="https://guidocarieri.github.io/ssap-mcp/">on the documentation site</a> instead.</strong>
 Same text, but there the author names are marked so that translators leave them
 alone. GitHub strips that marking from a README — measured — and a translator
 then turns <code>Morgenstern-Price</code> into <em>"prezzo Morgentern"</em>, as though <strong>Price</strong>
 were a price rather than the surname of Vaughan Price. A method by that name does
 not exist.</p>
-<p>An <a href="https://modelcontextprotocol.io">MCP</a> server that drives <strong>SSAP2010</strong> — the
+<p translate="yes">An <a href="https://modelcontextprotocol.io">MCP</a> server that drives <strong>SSAP2010</strong> — the
 <em>Slope Stability Analysis Program</em> by Prof. Lorenzo Borselli — so that an AI
 assistant can prepare a model, choose the calculation method and the search
 engine, run the verification and read the resulting factor of safety.</p>
-<blockquote>
-<p><strong>Not affiliated with the author of SSAP.</strong> SSAP2010 is free software by
+<blockquote translate="yes">
+<p translate="yes"><strong>Not affiliated with the author of SSAP.</strong> SSAP2010 is free software by
 Prof. Lorenzo Borselli (<a href="https://www.ssap.eu">https://www.ssap.eu</a>), it is <em>not</em> open source, and
 its redistribution is not permitted. This repository contains <strong>no part of
 SSAP</strong>: it drives a copy that you download and install yourself.</p>
 </blockquote>
-<p><strong>Tested against SSAP's own models.</strong> All <strong>20</strong> verification cases in
+<p translate="yes"><strong>Tested against SSAP's own models.</strong> All <strong>20</strong> verification cases in
 <a href="tests/CAMPAGNA.md"><code>tests/CAMPAGNA.md</code></a> reach a result — nineteen of them are
 models shipped with SSAP2010, so anyone who has it installed can repeat the whole
 campaign and check the numbers. Every factor of safety is read from the final
@@ -62,36 +62,36 @@ liquefaction <strong>−44.2%</strong>, drained against undrained <strong>−27.
 is not sound it says so: two of them are marked <em>not valid</em> and one result
 <em>unexplained</em>, instead of being quietly left out.</p>
 <hr />
-<h2>⛔ Read this first: this is <strong>not</strong> a way to run SSAP without a screen</h2>
-<p>This is the single most important limitation, and the one most easily
+<h2 translate="yes">⛔ Read this first: this is <strong>not</strong> a way to run SSAP without a screen</h2>
+<p translate="yes">This is the single most important limitation, and the one most easily
 misunderstood, so it is stated in plain words before anything else.</p>
-<p>In computing, a program is called <strong>headless</strong> when it can run with no screen and
+<p translate="yes">In computing, a program is called <strong>headless</strong> when it can run with no screen and
 nobody watching — you type a command, it works in the background, and it can
 therefore run on a rented server, inside a container, or overnight on a machine
 nobody is logged into. <strong>SSAP is not such a program, and this server does not
 make it one.</strong></p>
-<p>SSAP is a graphical program. In its public release it has <strong>no command line, no
+<p translate="yes">SSAP is a graphical program. In its public release it has <strong>no command line, no
 batch mode and no scripting interface</strong> — verified against the whole 511-page
 manual of rel. 5.2 and the official website. Consequently this server needs, on
 the same computer:</p>
 <ul>
-<li>SSAP2010 <strong>installed</strong> (download it from <a href="https://www.ssap.eu">https://www.ssap.eu</a>);</li>
-<li>a <strong>real, logged-in Windows desktop</strong>. Not a remote machine with nobody logged
+<li translate="yes">SSAP2010 <strong>installed</strong> (download it from <a href="https://www.ssap.eu">https://www.ssap.eu</a>);</li>
+<li translate="yes">a <strong>real, logged-in Windows desktop</strong>. Not a remote machine with nobody logged
   in, not a container, not a background service: SSAP's own window must actually
   exist somewhere on a screen, even if nobody is looking at it;</li>
-<li><strong>administrator rights</strong>, for the reason explained in the table below.</li>
+<li translate="yes"><strong>administrator rights</strong>, for the reason explained in the table below.</li>
 </ul>
-<p>So the promise here is <em>"nobody has to sit and click"</em>, <strong>not</strong> <em>"no screen is
+<p translate="yes">So the promise here is <em>"nobody has to sit and click"</em>, <strong>not</strong> <em>"no screen is
 needed"</em>. The two sound similar and are completely different. What disappears is
 the human operator, not the desktop.</p>
-<p>One thing it deliberately does <strong>not</strong> do: it never simulates mouse clicks or
+<p translate="yes">One thing it deliberately does <strong>not</strong> do: it never simulates mouse clicks or
 keystrokes. The four operations that must go through SSAP's window (load model,
 load settings, start verification, produce report) are performed by sending
 Windows messages directly to the buttons (<code>PostMessage</code>/<code>BM_CLICK</code>). Your mouse,
 your keyboard and your active window remain yours while a verification is
 running — you can keep working on something else.</p>
-<h2>How it works</h2>
-<p>The idea that makes this possible: <strong>SSAP is instructed through its files, not
+<h2 translate="yes">How it works</h2>
+<p translate="yes">The idea that makes this possible: <strong>SSAP is instructed through its files, not
 through its menus.</strong> The calculation method and the search engine are stored as
 plain text inside the <code>.PAR</code> settings file. They can be written there directly,
 and SSAP obeys what it finds. The window is only used to press <em>start</em>.</p>
@@ -99,19 +99,19 @@ and SSAP obeys what it finds. The window is only used to press <em>start</em>.</
    .MOD/.DAT/.GEO     writes the .PAR       runs SSAP          Fs + which method
                                                                was really used
 </code></pre>
-<p>⛔ <strong>Never trust the file you wrote — always check the report SSAP wrote back.</strong>
+<p translate="yes">⛔ <strong>Never trust the file you wrote — always check the report SSAP wrote back.</strong>
 If you put a value SSAP does not accept into the <code>.PAR</code>, it is ignored <em>in
 silence</em>: no error message, no warning, and the verification runs with something
 other than what you asked for. <code>read_report</code> therefore extracts the
 <code>METODO DI CALCOLO</code> and <code>MOTORE DI RICERCA</code> lines from the final report, which
 are the only trustworthy statement of what was actually used. Reading it back is
 not a formality: it is the only way to know.</p>
-<p>⛔ <strong>The <code>.tmp</code> files and <code>temp_*.dxf</code> are not the results.</strong> They are snapshots
+<p translate="yes">⛔ <strong>The <code>.tmp</code> files and <code>temp_*.dxf</code> are not the results.</strong> They are snapshots
 taken while the computation is still running. On one and the same verification, a
 temporary file and the final report differed by 0.018 on Fs. The real report is
 written only when you ask for it, and only after the computation has finished.</p>
-<h2>What you need before you start</h2>
-<p>This is not a program you download and double-click. It is a <strong>server that an AI
+<h2 translate="yes">What you need before you start</h2>
+<p translate="yes">This is not a program you download and double-click. It is a <strong>server that an AI
 assistant talks to</strong>: on its own it has no window, no menu and no command line,
 and it does nothing until an assistant calls it. Here is the complete chain of
 things you need, stated in full so that nobody discovers a missing piece halfway
@@ -119,9 +119,9 @@ through.</p>
 <table>
 <thead>
 <tr>
-<th>you need</th>
-<th>why it is needed</th>
-<th>note</th>
+<th translate="yes">you need</th>
+<th translate="yes">why it is needed</th>
+<th translate="yes">note</th>
 </tr>
 </thead>
 <tbody>
@@ -167,7 +167,7 @@ through.</p>
 </tr>
 </tbody>
 </table>
-<p>⛔ <strong>Be clear about the last two rows.</strong> Without an MCP client <em>and</em> a model
+<p translate="yes">⛔ <strong>Be clear about the last two rows.</strong> Without an MCP client <em>and</em> a model
 behind it, this repository does nothing whatsoever — there is no interface of its
 own to fall back on. And if all you want is to run a single verification, SSAP on
 its own does it better and faster than any of this: it was designed for that, and
@@ -176,14 +176,14 @@ have to run <em>many</em> verifications one after another — every method again
 engine, say, or the same slope with twenty parameter sets — or when the
 verification has to sit inside a longer chain of processing that is already
 automated.</p>
-<p>Dependencies installed automatically: <code>mcp</code>, <code>ezdxf</code>, <code>numpy</code>, <code>laspy</code>,
+<p translate="yes">Dependencies installed automatically: <code>mcp</code>, <code>ezdxf</code>, <code>numpy</code>, <code>laspy</code>,
 <code>matplotlib</code>.</p>
-<h2>Install</h2>
+<h2 translate="yes">Install</h2>
 <pre><code class="language-bash">git clone https://github.com/guidocarieri/ssap-mcp
 cd ssap-mcp
 uv sync
 </code></pre>
-<p>Then register it with your MCP client (the paths below are examples — use your
+<p translate="yes">Then register it with your MCP client (the paths below are examples — use your
 own):</p>
 <pre><code class="language-json">{
   &quot;mcpServers&quot;: {
@@ -194,18 +194,18 @@ own):</p>
   }
 }
 </code></pre>
-<p><strong>Start the client as administrator</strong>, so that the server inherits those rights
+<p translate="yes"><strong>Start the client as administrator</strong>, so that the server inherits those rights
 (see the table above for why they are needed). If you would rather not confirm a
 Windows security prompt at every run, point <code>SSAP_ELEVATED_RUNNER</code> at a helper of
 your own that executes an elevated PowerShell script — this is optional, and the
 server works without it.</p>
-<h3>Environment variables</h3>
+<h3 translate="yes">Environment variables</h3>
 <table>
 <thead>
 <tr>
-<th>variable</th>
-<th>default</th>
-<th>meaning</th>
+<th translate="yes">variable</th>
+<th translate="yes">default</th>
+<th translate="yes">meaning</th>
 </tr>
 </thead>
 <tbody>
@@ -231,14 +231,14 @@ server works without it.</p>
 </tr>
 </tbody>
 </table>
-<h2>Tools</h2>
-<p>These are the operations the assistant can call. Names in <code>code</code> are the ones it
+<h2 translate="yes">Tools</h2>
+<p translate="yes">These are the operations the assistant can call. Names in <code>code</code> are the ones it
 uses; you never type them yourself.</p>
 <table>
 <thead>
 <tr>
-<th>tool</th>
-<th>what it does</th>
+<th translate="yes">tool</th>
+<th translate="yes">what it does</th>
 </tr>
 </thead>
 <tbody>
@@ -296,137 +296,137 @@ uses; you never type them yourself.</p>
 </tr>
 </tbody>
 </table>
-<h3>Calculation methods and search engines</h3>
-<p>The numbers in the first column are the <strong>codes</strong> to pass to
+<h3 translate="yes">Calculation methods and search engines</h3>
+<p translate="yes">The numbers in the first column are the <strong>codes</strong> to pass to
 <code>set_analysis_options</code> — the same numbers SSAP stores in the <code>.PAR</code> file. They
 were verified one by one by running each and reading back the method name from
 the report, because the labels written inside older settings files are wrong.</p>
-<p><strong><code>method</code> — the limit-equilibrium method used to compute Fs:</strong></p>
+<p translate="yes"><strong><code>method</code> — the limit-equilibrium method used to compute Fs:</strong></p>
 <table>
 <thead>
 <tr>
-<th>code</th>
-<th>method</th>
-<th>after</th>
+<th translate="yes">code</th>
+<th translate="yes">method</th>
+<th translate="yes">after</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td translate="no">1</td>
-<td translate="no"><code translate="no">Janbu rigorous</code></td>
-<td translate="no">Janbu, 1973</td>
+<td><span translate="no">1</span></td>
+<td><code translate="no">Janbu rigorous</code></td>
+<td><span translate="no">Janbu, 1973</span></td>
 </tr>
 <tr>
-<td translate="no">2</td>
-<td translate="no"><code translate="no">Spencer</code></td>
-<td translate="no">Spencer, 1973</td>
+<td><span translate="no">2</span></td>
+<td><code translate="no">Spencer</code></td>
+<td><span translate="no">Spencer, 1973</span></td>
 </tr>
 <tr>
-<td translate="no">3</td>
-<td translate="no"><code translate="no">Sarma I</code></td>
-<td translate="no">Sarma, 1973</td>
+<td><span translate="no">3</span></td>
+<td><code translate="no">Sarma I</code></td>
+<td><span translate="no">Sarma, 1973</span></td>
 </tr>
 <tr>
-<td translate="no">4</td>
-<td translate="no"><code translate="no">Morgenstern-Price</code></td>
-<td translate="no">Morgenstern &amp; Price, 1965</td>
+<td><span translate="no">4</span></td>
+<td><code translate="no">Morgenstern-Price</code></td>
+<td><span translate="no">Morgenstern &amp; Price, 1965</span></td>
 </tr>
 <tr>
-<td translate="no">5</td>
-<td translate="no"><code translate="no">Chen-Morgenstern</code></td>
-<td translate="no">Chen &amp; Morgenstern, 1983</td>
+<td><span translate="no">5</span></td>
+<td><code translate="no">Chen-Morgenstern</code></td>
+<td><span translate="no">Chen &amp; Morgenstern, 1983</span></td>
 </tr>
 <tr>
-<td translate="no">6</td>
-<td translate="no"><code translate="no">Sarma II</code></td>
-<td translate="no">Sarma, 1979</td>
+<td><span translate="no">6</span></td>
+<td><code translate="no">Sarma II</code></td>
+<td><span translate="no">Sarma, 1979</span></td>
 </tr>
 <tr>
-<td translate="no">7</td>
-<td translate="no"><code translate="no">Borselli</code></td>
-<td translate="no">Borselli, 2016</td>
+<td><span translate="no">7</span></td>
+<td><code translate="no">Borselli</code></td>
+<td><span translate="no">Borselli, 2016</span></td>
 </tr>
 </tbody>
 </table>
-<p>Note that <strong><code>Sarma I</code> and <code>Sarma II</code> are two different formulations by the same
+<p translate="yes">Note that <strong><code>Sarma I</code> and <code>Sarma II</code> are two different formulations by the same
 author</strong>, published six years apart — the year in the third column is what tells
 them apart, and they are not interchangeable.</p>
-<p>⚠️ <strong>Do not read this table through an automatic translator.</strong> Every name in the
+<p translate="yes">⚠️ <strong>Do not read this table through an automatic translator.</strong> Every name in the
 middle column is a surname, and machine translation turns some of them into
 ordinary words: <code>Morgenstern-Price</code> has been seen rendered into Italian as
 <em>"prezzo Morgentern"</em>, as though <strong>Price</strong> were the cost of something rather than
 the surname of Vaughan Price, and <code>Sarma</code> becomes <em>"Sarca"</em> or <em>"Sara"</em>. If the
 page you are looking at shows anything other than the names above, you are
 reading a translation, not this document.</p>
-<p><strong><code>engine</code> — the algorithm that searches for the critical surface:</strong></p>
+<p translate="yes"><strong><code>engine</code> — the algorithm that searches for the critical surface:</strong></p>
 <table>
 <thead>
 <tr>
-<th>code</th>
-<th>search engine</th>
-<th>after</th>
+<th translate="yes">code</th>
+<th translate="yes">search engine</th>
+<th translate="yes">after</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td translate="no">1</td>
-<td translate="no"><code translate="no">Random Search</code></td>
-<td translate="no">Siegel, 1981</td>
+<td><span translate="no">1</span></td>
+<td><code translate="no">Random Search</code></td>
+<td><span translate="no">Siegel, 1981</span></td>
 </tr>
 <tr>
-<td translate="no">2</td>
-<td translate="no"><code translate="no">Convex Random Search</code></td>
-<td translate="no">Chen, 1992</td>
+<td><span translate="no">2</span></td>
+<td><code translate="no">Convex Random Search</code></td>
+<td><span translate="no">Chen, 1992</span></td>
 </tr>
 <tr>
-<td translate="no">3</td>
-<td translate="no"><code translate="no">Sniff Random Search 3.4</code></td>
-<td translate="no">Borselli, 1997-2025</td>
+<td><span translate="no">3</span></td>
+<td><code translate="no">Sniff Random Search 3.4</code></td>
+<td><span translate="no">Borselli, 1997-2025</span></td>
 </tr>
 <tr>
-<td translate="no">4</td>
-<td translate="no"><code translate="no">New Random Search 2.0</code></td>
-<td translate="no">Borselli, 2021-2025</td>
+<td><span translate="no">4</span></td>
+<td><code translate="no">New Random Search 2.0</code></td>
+<td><span translate="no">Borselli, 2021-2025</span></td>
 </tr>
 <tr>
-<td translate="no">5</td>
-<td translate="no"><code translate="no">Mixed Engines Search 2.0</code></td>
-<td translate="no">Borselli, 2025-2026</td>
+<td><span translate="no">5</span></td>
+<td><code translate="no">Mixed Engines Search 2.0</code></td>
+<td><span translate="no">Borselli, 2025-2026</span></td>
 </tr>
 </tbody>
 </table>
-<p>⚠️ <strong>Settings files from older versions declare the wrong ranges.</strong> A <code>.PAR</code>
+<p translate="yes">⚠️ <strong>Settings files from older versions declare the wrong ranges.</strong> A <code>.PAR</code>
 produced by SSAP 5.x lists fewer methods and engines than the current program
 accepts, so its own labels are misleading and cannot be used as a reference. If
 in doubt, regenerate it: load the <code>.MOD</code> in a current SSAP, save the settings
 again, and use that file as your template.</p>
-<h2>What this is for, and what it is not</h2>
-<p>The manual (§ 2.6.6) advises that <em>a complete and reliable verification may
+<h2 translate="yes">What this is for, and what it is not</h2>
+<p translate="yes">The manual (§ 2.6.6) advises that <em>a complete and reliable verification may
 require testing more than one search engine in succession</em>. Done by hand that
 means one session per engine, and in practice almost nobody does it. Done
 automatically it costs machine time instead of human time, so running every
 method against every engine, repeatedly, becomes something you can actually
 afford to do.</p>
-<p>Two warnings that matter more than any of the code:</p>
+<p translate="yes">Two warnings that matter more than any of the code:</p>
 <ul>
-<li><strong>Repeating a run is not a luxury.</strong> The search for the critical surface is
+<li translate="yes"><strong>Repeating a run is not a luxury.</strong> The search for the critical surface is
   pseudo-random: two identical runs do not return exactly the same number. In
   this very campaign, two configurations differed by 0.004 — well inside that
   scatter — which means a single run per configuration cannot tell a real
   difference from noise. Conclusions drawn from one run have been measured to
   reverse when repeated.</li>
-<li><strong>Automation does not improve the input.</strong> A solver fed with unrealistic
+<li translate="yes"><strong>Automation does not improve the input.</strong> A solver fed with unrealistic
   parameters returns a perfectly computed, perfectly wrong number — only faster.
   Deciding the stratigraphy, the strength parameters and the groundwater
   conditions is the geologist's work, this tool does none of it, and whoever
   signs the result remains responsible for it.</li>
 </ul>
-<h2>Credits</h2>
-<p>SSAP2010 is developed by <strong>Prof. Lorenzo Borselli</strong> (Instituto de Geología /
+<h2 translate="yes">Credits</h2>
+<p translate="yes">SSAP2010 is developed by <strong>Prof. Lorenzo Borselli</strong> (Instituto de Geología /
 Facultad de Ingeniería, Universidad Autónoma de San Luis Potosí, Mexico) and is
 distributed free of charge at <a href="https://www.ssap.eu">https://www.ssap.eu</a>. All the credit for the
 analysis itself belongs to him; this repository only automates its operation.</p>
-<h2>Licence</h2>
-<p>MIT — see <a href="LICENSE">LICENSE</a>. The licence covers this code only, never SSAP.</p>
+<h2 translate="yes">Licence</h2>
+<p translate="yes">MIT — see <a href="LICENSE">LICENSE</a>. The licence covers this code only, never SSAP.</p>
 </body>
 </html>

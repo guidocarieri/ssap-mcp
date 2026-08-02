@@ -88,16 +88,51 @@ LINGUE = {
 }
 
 
+BLOCCHI_DA_TRADURRE = ("p", "h1", "h2", "h3", "h4", "li", "blockquote", "th")
+
+
 def proteggi_tabelle(html: str) -> str:
-    """Marca `translate="no"` ogni cella delle tabelle di nomi propri."""
+    """Sottrae alla traduzione i NOMI, non le celle che li contengono.
+
+    ⛔ Misurato sul dispositivo reale il 2026-08-02 (iPhone, traduzione di
+    Safari): marcando `translate="no"` sui `<td>` — cioe' su 36 elementi di
+    BLOCCO — la tabella restava in inglese come voluto, ma **il traduttore non
+    ripartiva piu'**: tutto il testo a valle della tabella rimaneva in inglese.
+    Una protezione che si allarga oltre il suo oggetto e' un guasto, non una
+    protezione parziale.
+
+    Quindi qui si marcano solo frammenti INLINE (`<span>`, `<code>`) dentro la
+    cella, e ogni blocco di testo riafferma `translate="yes"` — l'attributo si
+    eredita, e riaffermarlo impedisce a un "no" di colare sul resto del
+    documento.
+    """
     def _una(m: re.Match) -> str:
         tabella = m.group(0)
         if not any(t in tabella for t in TABELLE_DA_PROTEGGERE):
             return tabella
-        # solo <td>: le intestazioni ("code", "method") sono parole comuni e
-        # possono essere tradotte senza danno.
-        return tabella.replace("<td>", '<td translate="no">')
+
+        def _cella(c: re.Match) -> str:
+            dentro = c.group(1)
+            if 'translate="no"' in dentro:   # gia' protetto a mano nel README
+                return c.group(0)
+            return f'<td><span translate="no">{dentro}</span></td>'
+
+        # le intestazioni ("code", "method") sono parole comuni: restano tradotte
+        return re.sub(r"<td>(.*?)</td>", _cella, tabella, flags=re.DOTALL)
+
     return re.sub(r"<table>.*?</table>", _una, html, flags=re.DOTALL)
+
+
+def riattiva_traduzione(html: str) -> str:
+    """Ogni blocco di testo dichiara di essere traducibile.
+
+    Serve a isolare i frammenti protetti: senza questo, un `translate="no"`
+    incontrato dal traduttore puo' spegnere la traduzione per tutto cio' che
+    segue, che e' il guasto misurato sull'iPhone.
+    """
+    for tag in BLOCCHI_DA_TRADURRE:
+        html = re.sub(rf"<{tag}>", f'<{tag} translate="yes">', html)
+    return html
 
 
 def sistema_collegamenti(html: str) -> str:
@@ -112,7 +147,7 @@ def genera() -> list[pathlib.Path]:
         testo = (RADICE / sorgente).read_text(encoding="utf-8")
         corpo = markdown.markdown(
             testo, extensions=["tables", "fenced_code", "sane_lists"])
-        corpo = proteggi_tabelle(sistema_collegamenti(corpo))
+        corpo = riattiva_traduzione(proteggi_tabelle(sistema_collegamenti(corpo)))
         pagina = SCHELETRO.format(lang=lang, titolo=titolo, css=CSS,
                                   lingue=LINGUE[lang], corpo=corpo)
         destinazione = DOCS / uscita
@@ -124,7 +159,9 @@ def genera() -> list[pathlib.Path]:
 if __name__ == "__main__":
     for p in genera():
         testo = p.read_text(encoding="utf-8")
-        protette = testo.count('<td translate="no">')
-        codici = testo.count('<code translate="no">')
-        print(f"{p.name}: {len(testo):,} caratteri · "
-              f"{protette} celle e {codici} nomi sottratti alla traduzione")
+        inline = testo.count('<span translate="no">') + testo.count('<code translate="no">')
+        blocchi_no = len(re.findall(r'<(?:p|h\d|li|td|tr|table|blockquote)[^>]*translate="no"', testo))
+        riattivati = testo.count('translate="yes"')
+        stato = "OK" if blocchi_no == 0 else f"ATTENZIONE: {blocchi_no} BLOCCHI marcati no"
+        print(f"{p.name}: {len(testo):,} caratteri - {inline} frammenti protetti, "
+              f"{riattivati} blocchi riattivati - {stato}")
