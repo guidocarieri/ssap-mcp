@@ -79,6 +79,12 @@ class Anchor:
     length: float       # lunghezza totale (m)
     T_design: float     # resistenza progetto (kN/m)
     cemented_pct: float = 20.0  # % lunghezza cementata
+    # 7a colonna, scritta da SSAP 6.1 e NON documentata nel manuale rel. 5.2.
+    # Vale 0.60 in tutti i file di tutte le commesse esaminate (2024-2025), con
+    # parametri di progetto molto diversi: e' un default del programma.
+    # 🔴 Significato non accertato; ipotesi non verificata: coefficiente di
+    # interazione allo sfilamento, analogo al `fb` delle geogriglie.
+    pullout_coeff: float = 0.60
 
 
 @dataclass
@@ -164,12 +170,30 @@ def write_svr(model: SlopeModel, out_dir: Path) -> Path | None:
 
 
 def write_tir(model: SlopeModel, out_dir: Path) -> Path | None:
+    """Scrive il file .TIR dei tiranti / chiodi.
+
+    ⛔ SETTE colonne, non sei. Il manuale rel. 5.2 ne documenta 6 (la sesta e'
+    la percentuale di lunghezza cementata), ma SSAP 6.1 ne scrive SETTE.
+
+    Misurato il 2026-08-02 su tre commesse reali diverse (09/2025, 03/2025,
+    12/2024-10/2025): tutti i file dal dic 2024 in poi hanno 7 colonne, tutti
+    quelli fino al 2022 ne hanno 6.
+
+    🔴 Il significato della settima NON e' documentato in nessuna fonte
+    disponibile. Vale pero' `0.60` in TUTTI i file di TUTTE le commesse, con
+    parametri di progetto molto diversi (T da 5 a 98 kN/m, L da 3 a 31 m, beta
+    da -15 a -55 gradi): e' dunque un DEFAULT scritto dal programma, non una
+    scelta di progetto. Ipotesi NON verificata: l'analogo del coefficiente `fb`
+    di interazione suolo-rinforzo allo sfilamento, documentato per le
+    geogriglie, per cui 0,60 e' un valore tipico.
+    """
     if not model.anchors:
         return None
     out = out_dir / f"{model.name}.tir"
     lines = [
         f"  {a.x:>10.4f} {a.y:>10.4f} {a.beta_deg:>8.2f} "
-        f"{a.length:>8.2f} {a.T_design:>10.2f} {a.cemented_pct:>6.1f}"
+        f"{a.length:>8.2f} {a.T_design:>10.2f} {a.cemented_pct:>6.1f} "
+        f"{a.pullout_coeff:>6.2f}"
         for a in model.anchors
     ]
     out.write_text("\n".join(lines) + "\n", encoding="ascii")
@@ -185,8 +209,23 @@ def write_mod(model: SlopeModel, out_dir: Path,
               pil_path: Path | None = None,
               liq_path: Path | None = None,
               jrc_path: Path | None = None,
-              wrm_path: Path | None = None) -> Path:
-    """Scrive il file master .MOD con flag e lista file."""
+              wrm_path: Path | None = None,
+              utm_path: Path | None = None) -> Path:
+    """Scrive il file master .MOD con flag e lista file.
+
+    ⛔ DIECI flag, non nove. Il manuale rel. 5.2 (feb 2023) ne documenta 9, ma
+    SSAP 6.1 ne scrive DIECI: il decimo dichiara il file **.UTM** con le
+    coordinate georeferenziate.
+
+    Accertato per differenza il 2026-08-02 su due modelli gemelli di una
+    commessa reale (SP 8, ott 2025): quello con il decimo flag a 1 elenca un
+    file in piu', `3003.utm` (EPSG:3003), l'altro no. Tutti i .MOD di tre
+    commesse diverse dal dic 2024 in poi hanno dieci flag; tutti quelli fino al
+    2022 ne hanno nove.
+
+    La fonte autorevole del formato NON e' il manuale: e' cio' che il programma
+    genera oggi. Il manuale e' fermo mentre il software e' andato avanti.
+    """
     n_strati = len(model.layers)
     flags = [
         n_strati,
@@ -198,6 +237,7 @@ def write_mod(model: SlopeModel, out_dir: Path,
         1 if liq_path else 0,
         1 if jrc_path else 0,
         1 if wrm_path else 0,
+        1 if utm_path else 0,
     ]
     lines: list[str] = [" ".join(str(f) for f in flags)]
     # Ordine FISSO da manuale sez. 3.5.1:
@@ -220,6 +260,8 @@ def write_mod(model: SlopeModel, out_dir: Path,
         lines.append(jrc_path.name)
     if wrm_path:
         lines.append(wrm_path.name)
+    if utm_path:
+        lines.append(utm_path.name)
 
     out = out_dir / f"{model.name}.MOD"
     out.write_text("\n".join(lines) + "\n", encoding="ascii")
