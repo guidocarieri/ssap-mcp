@@ -186,13 +186,13 @@ the report, because the labels written inside older settings files are wrong.
 
 | code | method | after |
 |---|---|---|
-| 1 | `Janbu rigorous` | Janbu, 1973 |
-| 2 | `Spencer` | Spencer, 1973 |
-| 3 | `Sarma I` | Sarma, 1973 |
-| 4 | `Morgenstern-Price` | Morgenstern & Price, 1965 |
-| 5 | `Chen-Morgenstern` | Chen & Morgenstern, 1983 |
-| 6 | `Sarma II` | Sarma, 1979 |
-| 7 | `Borselli` | Borselli, 2016 |
+| 1 | <code translate="no">Janbu rigorous</code> | Janbu, 1973 |
+| 2 | <code translate="no">Spencer</code> | Spencer, 1973 |
+| 3 | <code translate="no">Sarma I</code> | Sarma, 1973 |
+| 4 | <code translate="no">Morgenstern-Price</code> | Morgenstern &amp; Price, 1965 |
+| 5 | <code translate="no">Chen-Morgenstern</code> | Chen &amp; Morgenstern, 1983 |
+| 6 | <code translate="no">Sarma II</code> | Sarma, 1979 |
+| 7 | <code translate="no">Borselli</code> | Borselli, 2016 |
 
 Note that **`Sarma I` and `Sarma II` are two different formulations by the same
 author**, published six years apart — the year in the third column is what tells
@@ -210,11 +210,11 @@ reading a translation, not this document.
 
 | code | search engine | after |
 |---|---|---|
-| 1 | `Random Search` | Siegel, 1981 |
-| 2 | `Convex Random Search` | Chen, 1992 |
-| 3 | `Sniff Random Search 3.4` | Borselli, 1997-2025 |
-| 4 | `New Random Search 2.0` | Borselli, 2021-2025 |
-| 5 | `Mixed Engines Search 2.0` | Borselli, 2025-2026 |
+| 1 | <code translate="no">Random Search</code> | Siegel, 1981 |
+| 2 | <code translate="no">Convex Random Search</code> | Chen, 1992 |
+| 3 | <code translate="no">Sniff Random Search 3.4</code> | Borselli, 1997-2025 |
+| 4 | <code translate="no">New Random Search 2.0</code> | Borselli, 2021-2025 |
+| 5 | <code translate="no">Mixed Engines Search 2.0</code> | Borselli, 2025-2026 |
 
 ⚠️ **Settings files from older versions declare the wrong ranges.** A `.PAR`
 produced by SSAP 5.x lists fewer methods and engines than the current program

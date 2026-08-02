@@ -189,23 +189,23 @@ impostazioni più vecchi sono sbagliate.
 
 | codice | metodo | secondo |
 |---|---|---|
-| 1 | `Janbu rigorous` | Janbu, 1973 |
-| 2 | `Spencer` | Spencer, 1973 |
-| 3 | `Sarma I` | Sarma, 1973 |
-| 4 | `Morgenstern-Price` | Morgenstern & Price, 1965 |
-| 5 | `Chen-Morgenstern` | Chen & Morgenstern, 1983 |
-| 6 | `Sarma II` | Sarma, 1979 |
-| 7 | `Borselli` | Borselli, 2016 |
+| 1 | <code translate="no">Janbu rigorous</code> | Janbu, 1973 |
+| 2 | <code translate="no">Spencer</code> | Spencer, 1973 |
+| 3 | <code translate="no">Sarma I</code> | Sarma, 1973 |
+| 4 | <code translate="no">Morgenstern-Price</code> | Morgenstern &amp; Price, 1965 |
+| 5 | <code translate="no">Chen-Morgenstern</code> | Chen &amp; Morgenstern, 1983 |
+| 6 | <code translate="no">Sarma II</code> | Sarma, 1979 |
+| 7 | <code translate="no">Borselli</code> | Borselli, 2016 |
 
 **`engine` — l'algoritmo che cerca la superficie critica:**
 
 | codice | motore di ricerca | secondo |
 |---|---|---|
-| 1 | `Random Search` | Siegel, 1981 |
-| 2 | `Convex Random Search` | Chen, 1992 |
-| 3 | `Sniff Random Search 3.4` | Borselli, 1997-2025 |
-| 4 | `New Random Search 2.0` | Borselli, 2021-2025 |
-| 5 | `Mixed Engines Search 2.0` | Borselli, 2025-2026 |
+| 1 | <code translate="no">Random Search</code> | Siegel, 1981 |
+| 2 | <code translate="no">Convex Random Search</code> | Chen, 1992 |
+| 3 | <code translate="no">Sniff Random Search 3.4</code> | Borselli, 1997-2025 |
+| 4 | <code translate="no">New Random Search 2.0</code> | Borselli, 2021-2025 |
+| 5 | <code translate="no">Mixed Engines Search 2.0</code> | Borselli, 2025-2026 |
 
 I nomi nella colonna centrale sono **cognomi di autori** e restano in inglese di
 proposito: sono le stringhe esatte che SSAP stampa nella relazione, e chi
