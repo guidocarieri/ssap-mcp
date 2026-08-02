@@ -7,9 +7,9 @@ and most of its users are Italian, so this document exists in both languages.*
 [on the documentation site](https://guidocarieri.github.io/ssap-mcp/) instead.**
 Same text, but there the author names are marked so that translators leave them
 alone. GitHub strips that marking from a README — measured — and a translator
-then turns <span translate="no">Morgenstern-Price</span> into *prezzo
-Morgentern*, as though **Price** were a price rather than the surname of Vaughan
-Price. A method by that name does not exist.
+then turns `Morgenstern-Price` into *"prezzo Morgentern"*, as though **Price**
+were a price rather than the surname of Vaughan Price. A method by that name does
+not exist.
 
 An [MCP](https://modelcontextprotocol.io) server that drives **SSAP2010** — the
 *Slope Stability Analysis Program* by Prof. Lorenzo Borselli — so that an AI
@@ -200,10 +200,9 @@ the report, because the labels written inside older settings files are wrong.
 | 6 | <code translate="no">Sarma II</code> | Sarma, 1979 |
 | 7 | <code translate="no">Borselli</code> | Borselli, 2016 |
 
-Note that <span translate="no">Sarma I</span> and
-<span translate="no">Sarma II</span> are **two different formulations by the same
-author**, published six years apart. The year in the third column is what tells
-them apart, and the two are not interchangeable.
+Note that **`Sarma I` and `Sarma II` are two different formulations by the same
+author**, published six years apart — the year in the third column is what tells
+them apart, and they are not interchangeable.
 
 **`engine` — the algorithm that searches for the critical surface:**
 

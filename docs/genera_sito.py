@@ -123,31 +123,6 @@ def proteggi_tabelle(html: str) -> str:
     return re.sub(r"<table>.*?</table>", _una, html, flags=re.DOTALL)
 
 
-def prosa_non_traducibile(html: str) -> list[str]:
-    """Paragrafi che un traduttore rischia di saltare perche' sembrano codice.
-
-    ⛔ Misurato sull'iPhone il 2026-08-02: i due paragrafi sotto la tabella dei
-    metodi restavano in inglese mentre tutto il resto veniva tradotto. Erano gli
-    unici due che contenevano NOMI dentro `<code>` in mezzo alla prosa: un
-    traduttore che incontra elementi di codice in un paragrafo tende a lasciare
-    stare il paragrafo intero.
-
-    Nella prosa i nomi vanno marcati con `<span translate="no">`, che protegge il
-    nome senza far sembrare codice la frase che lo contiene. Il `<code>` resta
-    giusto nelle tabelle e per i nomi di file, di comandi e di parametri.
-    """
-    sospetti = []
-    for m in re.finditer(r"<p[^>]*>(.*?)</p>", html, flags=re.DOTALL):
-        testo = m.group(1)
-        codici = re.findall(r"<code[^>]*>(.*?)</code>", testo, flags=re.DOTALL)
-        nomi = [c for c in codici
-                if any(n in c for n in ("Sarma", "Morgenstern", "Janbu",
-                                        "Spencer", "Chen", "Random Search"))]
-        if nomi:
-            sospetti.append(", ".join(nomi))
-    return sospetti
-
-
 def riattiva_traduzione(html: str) -> str:
     """Ogni blocco di testo dichiara di essere traducibile.
 
