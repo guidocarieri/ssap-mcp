@@ -181,27 +181,35 @@ the report, because the labels written inside older settings files are wrong.
 
 | code | method | after |
 |---|---|---|
-| 1 | Janbu rigorous | Janbu, 1973 |
-| 2 | Spencer | Spencer, 1973 |
-| 3 | Sarma I | Sarma, 1973 |
-| 4 | Morgenstern-Price | Morgenstern & Price, 1965 |
-| 5 | Chen-Morgenstern | Chen & Morgenstern, 1983 |
-| 6 | Sarma II | Sarma, 1979 |
-| 7 | Borselli | Borselli, 2016 |
+| 1 | `Janbu rigorous` | Janbu, 1973 |
+| 2 | `Spencer` | Spencer, 1973 |
+| 3 | `Sarma I` | Sarma, 1973 |
+| 4 | `Morgenstern-Price` | Morgenstern & Price, 1965 |
+| 5 | `Chen-Morgenstern` | Chen & Morgenstern, 1983 |
+| 6 | `Sarma II` | Sarma, 1979 |
+| 7 | `Borselli` | Borselli, 2016 |
 
-Note that **Sarma I and Sarma II are two different formulations by the same
+Note that **`Sarma I` and `Sarma II` are two different formulations by the same
 author**, published six years apart — the year in the third column is what tells
 them apart, and they are not interchangeable.
+
+⚠️ **Do not read this table through an automatic translator.** Every name in the
+middle column is a surname, and machine translation turns some of them into
+ordinary words: `Morgenstern-Price` has been seen rendered into Italian as
+*"prezzo Morgentern"*, as though **Price** were the cost of something rather than
+the surname of Vaughan Price, and `Sarma` becomes *"Sarca"* or *"Sara"*. If the
+page you are looking at shows anything other than the names above, you are
+reading a translation, not this document.
 
 **`engine` — the algorithm that searches for the critical surface:**
 
 | code | search engine | after |
 |---|---|---|
-| 1 | Random Search | Siegel, 1981 |
-| 2 | Convex Random Search | Chen, 1992 |
-| 3 | Sniff Random Search 3.4 | Borselli, 1997-2025 |
-| 4 | New Random Search 2.0 | Borselli, 2021-2025 |
-| 5 | Mixed Engines Search 2.0 | Borselli, 2025-2026 |
+| 1 | `Random Search` | Siegel, 1981 |
+| 2 | `Convex Random Search` | Chen, 1992 |
+| 3 | `Sniff Random Search 3.4` | Borselli, 1997-2025 |
+| 4 | `New Random Search 2.0` | Borselli, 2021-2025 |
+| 5 | `Mixed Engines Search 2.0` | Borselli, 2025-2026 |
 
 ⚠️ **Settings files from older versions declare the wrong ranges.** A `.PAR`
 produced by SSAP 5.x lists fewer methods and engines than the current program
