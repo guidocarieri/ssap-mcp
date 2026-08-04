@@ -226,6 +226,30 @@ quanti il programma attuale ne accetti, quindi le sue etichette sono fuorvianti 
 non si possono usare come riferimento. Nel dubbio, rigeneralo: carica il `.MOD` in
 un SSAP aggiornato, salva di nuovo le impostazioni, e usa quel file come modello.
 
+## Dopo un aggiornamento di SSAP: controlla gli agganci
+
+SSAP viene aggiornato spesso. Prima di fidarti di questo server su un lavoro vero
+dopo un aggiornamento:
+
+```bash
+python tools/check_coupling.py
+```
+
+Ci mette circa un minuto e riferisce, uno per uno, le cinque cose a cui il server
+si aggrappa: il titolo della finestra, i sei pulsanti che preme, le due etichette
+del `.PAR` che scrive, e i campi che rilegge dalla relazione. Non esegue mai una
+verifica: ti dice *cosa si romperebbe*, invece di fartelo scoprire a meta' di un
+lavoro. Va lanciato **elevato**, altrimenti i controlli sui pulsanti non
+significano nulla.
+
+⚠️ **I sei nomi dei pulsanti sono in italiano**, perche' il pilota li cerca per
+uguaglianza esatta. Se l'interfaccia di SSAP e' impostata in inglese il server non
+li trova, e questo controllo lo dichiara apertamente.
+
+Misurato fra le build **15998 e 16064**: tutti gli agganci hanno tenuto, comprese
+le etichette del `.PAR`, passate da `[1 2 3]` a `[1 2 3 4 5]` senza rompere nulla
+perche' sono cercate per prefisso.
+
 ## A cosa serve, e a cosa non serve
 
 Il manuale (§ 2.6.6) avverte che *una verifica completa e affidabile può

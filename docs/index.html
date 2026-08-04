@@ -396,6 +396,21 @@ produced by SSAP 5.x lists fewer methods and engines than the current program
 accepts, so its own labels are misleading and cannot be used as a reference. If
 in doubt, regenerate it: load the <code>.MOD</code> in a current SSAP, save the settings
 again, and use that file as your template.</p>
+<h2 translate="yes">After an SSAP update: check the coupling</h2>
+<p translate="yes">SSAP is updated often. Before trusting this server on real work after an update:</p>
+<pre><code class="language-bash">python tools/check_coupling.py
+</code></pre>
+<p translate="yes">It takes about a minute and reports, one by one, the five things the server holds
+on to: the window title, the six buttons it presses, the two <code>.PAR</code> labels it
+writes, and the fields it reads back from the report. It never runs a
+verification — it tells you <em>what would break</em>, instead of letting you find out
+halfway through a job. Run it <strong>elevated</strong>, or the button checks mean nothing.</p>
+<p translate="yes">⚠️ <strong>The six button names are in Italian</strong>, because the pilot matches them
+exactly. If SSAP's interface is set to English the server cannot find them, and
+this check says so explicitly.</p>
+<p translate="yes">Measured across builds <strong>15998 → 16064</strong>: every coupling point held — including
+the <code>.PAR</code> labels, which changed from <code>[1 2 3]</code> to <code>[1 2 3 4 5]</code> without breaking
+anything, because they are matched by prefix.</p>
 <h2 translate="yes">What this is for, and what it is not</h2>
 <p translate="yes">The manual (§ 2.6.6) advises that <em>a complete and reliable verification may
 require testing more than one search engine in succession</em>. Done by hand that

@@ -223,6 +223,28 @@ accepts, so its own labels are misleading and cannot be used as a reference. If
 in doubt, regenerate it: load the `.MOD` in a current SSAP, save the settings
 again, and use that file as your template.
 
+## After an SSAP update: check the coupling
+
+SSAP is updated often. Before trusting this server on real work after an update:
+
+```bash
+python tools/check_coupling.py
+```
+
+It takes about a minute and reports, one by one, the five things the server holds
+on to: the window title, the six buttons it presses, the two `.PAR` labels it
+writes, and the fields it reads back from the report. It never runs a
+verification — it tells you *what would break*, instead of letting you find out
+halfway through a job. Run it **elevated**, or the button checks mean nothing.
+
+⚠️ **The six button names are in Italian**, because the pilot matches them
+exactly. If SSAP's interface is set to English the server cannot find them, and
+this check says so explicitly.
+
+Measured across builds **15998 → 16064**: every coupling point held — including
+the `.PAR` labels, which changed from `[1 2 3]` to `[1 2 3 4 5]` without breaking
+anything, because they are matched by prefix.
+
 ## What this is for, and what it is not
 
 The manual (§ 2.6.6) advises that *a complete and reliable verification may

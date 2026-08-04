@@ -399,6 +399,23 @@ sbagliati.</strong> Un <code>.PAR</code> prodotto da SSAP 5.x elenca meno metodi
 quanti il programma attuale ne accetti, quindi le sue etichette sono fuorvianti e
 non si possono usare come riferimento. Nel dubbio, rigeneralo: carica il <code>.MOD</code> in
 un SSAP aggiornato, salva di nuovo le impostazioni, e usa quel file come modello.</p>
+<h2 translate="yes">Dopo un aggiornamento di SSAP: controlla gli agganci</h2>
+<p translate="yes">SSAP viene aggiornato spesso. Prima di fidarti di questo server su un lavoro vero
+dopo un aggiornamento:</p>
+<pre><code class="language-bash">python tools/check_coupling.py
+</code></pre>
+<p translate="yes">Ci mette circa un minuto e riferisce, uno per uno, le cinque cose a cui il server
+si aggrappa: il titolo della finestra, i sei pulsanti che preme, le due etichette
+del <code>.PAR</code> che scrive, e i campi che rilegge dalla relazione. Non esegue mai una
+verifica: ti dice <em>cosa si romperebbe</em>, invece di fartelo scoprire a meta' di un
+lavoro. Va lanciato <strong>elevato</strong>, altrimenti i controlli sui pulsanti non
+significano nulla.</p>
+<p translate="yes">⚠️ <strong>I sei nomi dei pulsanti sono in italiano</strong>, perche' il pilota li cerca per
+uguaglianza esatta. Se l'interfaccia di SSAP e' impostata in inglese il server non
+li trova, e questo controllo lo dichiara apertamente.</p>
+<p translate="yes">Misurato fra le build <strong>15998 e 16064</strong>: tutti gli agganci hanno tenuto, comprese
+le etichette del <code>.PAR</code>, passate da <code>[1 2 3]</code> a <code>[1 2 3 4 5]</code> senza rompere nulla
+perche' sono cercate per prefisso.</p>
 <h2 translate="yes">A cosa serve, e a cosa non serve</h2>
 <p translate="yes">Il manuale (§ 2.6.6) avverte che <em>una verifica completa e affidabile può
 richiedere di provare più motori di ricerca in successione</em>. Fatto a mano
